@@ -1,6 +1,7 @@
 ---
 import Navbar from '../components/Navbar.astro';
 import AsciiBackground from '../components/AsciiBackground.astro';
+import CoverPage from '../components/CoverPage.astro'; // Import the CoverPage component
 
 interface Props {
 	title: string;
@@ -12,7 +13,7 @@ const maxNavbarHeight = "120px";
 ---
 
 <!doctype html>
-<html lang="fr"> {/* The class 'dark' will be added here by JS */}
+<html lang="fr">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="description" content={description} />
@@ -25,6 +26,14 @@ const maxNavbarHeight = "120px";
 				scroll-padding-top: var(--maxNavbarHeight);
 				scroll-behavior: smooth;
 			}
+      /* Prevent scroll on body while cover page is active */
+      body.cover-active {
+        overflow: hidden;
+        /* On some systems, scrollbar might still be there, taking space.
+           This is a common issue. For a perfect solution, more complex JS might be needed
+           to calculate scrollbar width and add padding, or use position:fixed on body.
+           For now, overflow:hidden is the simplest approach. */
+      }
 		</style>
 		{/* Inline script to set initial theme to prevent FOUC (Flash of Unstyled Content) */}
 		<script is:inline>
@@ -43,19 +52,64 @@ const maxNavbarHeight = "120px";
 			} else {
 				document.documentElement.classList.remove('dark'); // Ensure light is default if no class
 			}
-			// Store the initial theme choice so other scripts can access it if needed
-      // window.initialTheme = theme; // Not strictly needed if ThemeSwitcher handles its own state
 		</script>
 	</head>
 	<body>
+    <CoverPage /> {/* Add CoverPage here, it will control its own visibility */}
     <AsciiBackground />
 		<Navbar />
-		<main>
+		<main tabindex="-1"> {/* Added tabindex for programmatic focus */}
 			<slot />
 		</main>
 		<footer>
 			<p>&copy; {new Date().getFullYear()} SOS-PC. Tous droits réservés.</p>
 		</footer>
+    <script>
+      // Script to add/remove 'cover-active' class on body based on CoverPage state
+      document.addEventListener('DOMContentLoaded', () => {
+        const coverPage = document.getElementById('sos-pc-cover-page'); // ID from CoverPage.astro
+        const body = document.body;
+        const dismissedKey = 'sospc_cover_dismissed_session_v1'; // Must match key in CoverPage.astro
+
+        if (!coverPage) return;
+
+        function updateBodyScrollState() {
+          let isCoverDismissedBySession = false;
+          try {
+            isCoverDismissedBySession = sessionStorage.getItem(dismissedKey) === 'true';
+          } catch(e) { /* ignore */ }
+
+          // If coverPage has 'dismissed' class OR if it was dismissed in session (and might be hidden by its own script)
+          if (coverPage.classList.contains('dismissed') || isCoverDismissedBySession) {
+            body.classList.remove('cover-active');
+          } else {
+            body.classList.add('cover-active');
+          }
+        }
+
+        updateBodyScrollState(); // Set initial state
+
+        // Observe CoverPage for class changes (when it gets 'dismissed')
+        const observer = new MutationObserver((mutationsList) => {
+          for (const mutation of mutationsList) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+              updateBodyScrollState();
+              // If cover is now dismissed, we can stop observing
+              if (coverPage.classList.contains('dismissed')) {
+                observer.disconnect();
+              }
+              break; // Only need to check one mutation if class attribute changed
+            }
+          }
+        });
+        
+        // Only start observing if the cover page is not already dismissed by session logic
+        // (The CoverPage.astro script handles adding 'dismissed' class if session key is found)
+        if (!coverPage.classList.contains('dismissed')) {
+            observer.observe(coverPage, { attributes: true, attributeFilter: ['class'] });
+        }
+      });
+    </script>
 	</body>
 </html>
 <style define:vars={{ maxNavbarHeight }} is:global>
