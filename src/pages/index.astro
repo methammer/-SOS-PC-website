@@ -2,9 +2,9 @@
 import Layout from '../layouts/Layout.astro';
 // Import Swiper styles
 import 'swiper/css';
-import 'swiper/css/navigation'; // If using navigation buttons
-import 'swiper/css/pagination'; // If using pagination dots
-import 'swiper/css/effect-coverflow'; // Import coverflow effect CSS
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/effect-coverflow';
 
 // JS Imports moved to the client-side script below
 ---
@@ -87,7 +87,6 @@ import 'swiper/css/effect-coverflow'; // Import coverflow effect CSS
 		</div>
 	</section>
 
-	<!-- Location/Map Section -->
 	<section id="location" class="map-section">
 		<h2>Notre Zone d'Intervention Principale</h2>
 		<p>Basé près de 04700 Le Castellet, nous intervenons dans les environs.</p>
@@ -110,15 +109,12 @@ import 'swiper/css/effect-coverflow'; // Import coverflow effect CSS
 		</div>
 	</section>
 
-	<!-- Vitrine Section - Now a Coverflow Carousel -->
 	<section id="vitrine">
 		<h2>Notre Vitrine Web</h2>
 		<p class="vitrine-intro">Quelques exemples de sites web que nous avons réalisés.</p>
 
-		<!-- Swiper Container -->
 		<div class="swiper vitrine-swiper">
 			<div class="swiper-wrapper">
-				<!-- Slide 1 -->
 				<div class="swiper-slide">
 					<article class="vitrine-item">
 						<img src="https://via.placeholder.com/400x250.png?text=Site+Artisan" alt="Aperçu Site Artisan" class="vitrine-image">
@@ -129,7 +125,6 @@ import 'swiper/css/effect-coverflow'; // Import coverflow effect CSS
 						</div>
 					</article>
 				</div>
-				<!-- Slide 2 -->
 				<div class="swiper-slide">
 					<article class="vitrine-item">
 						<img src="https://via.placeholder.com/400x250.png?text=Site+Restaurant" alt="Aperçu Site Restaurant" class="vitrine-image">
@@ -140,7 +135,6 @@ import 'swiper/css/effect-coverflow'; // Import coverflow effect CSS
 						</div>
 					</article>
 				</div>
-				<!-- Slide 3 -->
 				<div class="swiper-slide">
 					<article class="vitrine-item">
 						<img src="https://via.placeholder.com/400x250.png?text=Portfolio+Photographe" alt="Aperçu Portfolio Photographe" class="vitrine-image">
@@ -151,10 +145,8 @@ import 'swiper/css/effect-coverflow'; // Import coverflow effect CSS
 						</div>
 					</article>
 				</div>
-				<!-- Slide 4: New Slide -->
 				<div class="swiper-slide">
 					<article class="vitrine-item">
-						<!-- Replace this src with an actual screenshot URL -->
 						<img src="https://via.placeholder.com/400x250.png?text=Aperçu+Bolt+DIY+2" alt="Aperçu Projet Bolt DIY 2" class="vitrine-image">
 						<div class="vitrine-content">
 							<h3>Projet Bolt DIY 2</h3>
@@ -163,11 +155,8 @@ import 'swiper/css/effect-coverflow'; // Import coverflow effect CSS
 						</div>
 					</article>
 				</div>
-				<!-- Add more slides as needed -->
 			</div>
-			<!-- Add Pagination -->
 			<div class="swiper-pagination"></div>
-			<!-- Add Navigation -->
 			<div class="swiper-button-prev"></div>
 			<div class="swiper-button-next"></div>
 		</div>
@@ -215,61 +204,33 @@ import 'swiper/css/effect-coverflow'; // Import coverflow effect CSS
 
 </Layout>
 
-<!-- Swiper Initialization Script (Client-Side Only) -->
 <script>
-  // Import Swiper and modules directly inside the client-side script
   import Swiper from 'swiper';
-  // Import necessary modules
   import { Navigation, Pagination, EffectCoverflow } from 'swiper/modules';
 
-  // Wait for the DOM to be fully loaded before initializing Swiper
   document.addEventListener('DOMContentLoaded', () => {
     const swiper = new Swiper('.vitrine-swiper', {
-      // Use the imported modules
-      modules: [Navigation, Pagination, EffectCoverflow], // Add EffectCoverflow
-
-      // Core Swiper parameters
-      effect: 'coverflow', // Set the effect to coverflow
-      grabCursor: true, // Show grab cursor
-      centeredSlides: true, // Center the active slide
-      loop: true, // Enable continuous loop mode
-      slidesPerView: 'auto', // Adjust based on content/container width (often best for coverflow)
-      // slidesPerView: 1.5, // Alternative: Show 1 full and parts of adjacent slides
-
-      // Coverflow effect parameters (adjust these values to fine-tune the effect)
+      modules: [Navigation, Pagination, EffectCoverflow],
+      effect: 'coverflow',
+      grabCursor: true,
+      centeredSlides: true,
+      loop: true,
+      slidesPerView: 'auto',
       coverflowEffect: {
-        rotate: 50,       // Slide rotation in degrees
-        stretch: 0,       // Stretch space between slides (in px)
-        depth: 100,       // Depth offset in px (lower means closer)
-        modifier: 1,      // Effect multiplier (higher means more pronounced effect)
-        slideShadows: true, // Enable slide shadows
+        rotate: 50,
+        stretch: 0,
+        depth: 100,
+        modifier: 1,
+        slideShadows: true,
       },
-
-      // If we need pagination
       pagination: {
         el: '.swiper-pagination',
-        clickable: true, // Allow clicking on dots to navigate
+        clickable: true,
       },
-
-      // Navigation arrows
       navigation: {
         nextEl: '.swiper-button-next',
         prevEl: '.swiper-button-prev',
       },
-
-      // Responsive breakpoints (optional, coverflow often adapts well with 'auto')
-      // breakpoints: {
-      //   // when window width is >= 768px
-      //   768: {
-      //     slidesPerView: 2,
-      //     // Adjust coverflowEffect for larger screens if needed
-      //   },
-      //   // when window width is >= 1024px
-      //   1024: {
-      //     slidesPerView: 3,
-      //     // Adjust coverflowEffect for larger screens if needed
-      //   }
-      // }
     });
   });
 </script>
@@ -279,23 +240,24 @@ import 'swiper/css/effect-coverflow'; // Import coverflow effect CSS
 	.tagline {
 		text-align: center;
 		font-style: italic;
-		color: #c0c0c0;
+		color: var(--text-color); /* Use CSS variable */
+		opacity: 0.8;
 		margin-bottom: 3rem;
+		transition: color 0.3s ease;
 	}
 
-	/* Section Styling & Separators */
 	section {
 		margin-bottom: 3rem;
 		padding: 2rem;
 		border-bottom: none;
 		position: relative;
-		background-color: transparent;
+		/* background-color: transparent; Removed, main has bg now */
 		border-radius: 8px;
 		transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
 	}
 
 	section:hover {
-		background-color: rgba(35, 38, 45, 0.3);
+		background-color: var(--section-hover-bg); /* Use CSS variable */
 		transform: translateY(-3px);
 		box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
 	}
@@ -309,9 +271,9 @@ import 'swiper/css/effect-coverflow'; // Import coverflow effect CSS
 		width: 80%;
 		max-width: 500px;
 		height: 2px;
-		background: linear-gradient(to right, transparent, rgb(var(--accent)), transparent);
+		background: linear-gradient(to right, transparent, var(--section-separator-color), transparent); /* Use CSS variable */
 		opacity: 0.5;
-		transition: opacity 0.3s ease;
+		transition: opacity 0.3s ease, background 0.3s ease;
 	}
 
 	section:hover::after {
@@ -327,18 +289,19 @@ import 'swiper/css/effect-coverflow'; // Import coverflow effect CSS
 		opacity: 0.9;
 	}
 
-	/* Services Section CTA Styling */
 	.cta-section h2 {
 		text-align: center;
 		margin-bottom: 1rem;
 	}
 	.services-intro {
 		text-align: center;
-		color: #d0d0d0;
+		color: var(--text-color); /* Use CSS variable */
+		opacity: 0.9;
 		margin-bottom: 2.5rem;
 		max-width: 60ch;
 		margin-left: auto;
 		margin-right: auto;
+		transition: color 0.3s ease;
 	}
 	.service-cards {
 		display: grid;
@@ -346,13 +309,14 @@ import 'swiper/css/effect-coverflow'; // Import coverflow effect CSS
 		gap: 1.5rem;
 	}
 	.service-card {
-		background-color: #23262d;
+		background-color: var(--card-bg-color); /* Use CSS variable */
 		padding: 0;
 		border-radius: 8px;
 		display: flex;
 		flex-direction: column;
-		transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+		transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s ease;
 		overflow: hidden;
+		border: 1px solid var(--border-color); /* Add subtle border */
 	}
 	.service-card:hover {
 		transform: translateY(-5px);
@@ -369,39 +333,41 @@ import 'swiper/css/effect-coverflow'; // Import coverflow effect CSS
 		align-items: center;
 		gap: 0.7rem;
 		margin-top: 0;
-		color: rgb(var(--accent-light));
+		color: var(--heading-color); /* Use CSS variable */
 		padding: 1rem 1.5rem 0 1.5rem;
 	}
 	.service-card p {
 		flex-grow: 1;
 		margin-bottom: 1rem;
-		color: #c0c0c0;
+		color: var(--card-text-color); /* Use CSS variable */
 		padding: 0 1.5rem;
+		transition: color 0.3s ease;
 	}
 	.service-card ul {
 		font-size: 0.9em;
 		margin-bottom: 1.5rem;
 		padding: 0 1.5rem 0 2.7rem;
 		flex-grow: 1;
+		color: var(--card-text-color); /* Use CSS variable */
+		transition: color 0.3s ease;
 	}
 	.service-card li {
 		margin-bottom: 0.4rem;
 	}
 	.cta-button {
 		display: block;
-		background-color: rgb(var(--accent));
-		color: white;
+		background-color: var(--button-bg-color); /* Use CSS variable */
+		color: var(--button-text-color); /* Use CSS variable */
 		padding: 0.7rem 1.2rem;
-		border-radius: 0;
+		border-radius: 5px;
 		text-decoration: none;
 		text-align: center;
 		font-weight: bold;
-		transition: background-color 0.2s ease;
-		margin: 1.5rem 1.5rem 1.5rem 1.5rem;
-		border-radius: 5px;
+		transition: background-color 0.2s ease, color 0.3s ease;
+		margin: 1.5rem; /* Keep margin consistent */
 	}
 	.cta-button:hover {
-		background-color: rgb(var(--accent-dark));
+		background-color: var(--button-hover-bg-color); /* Use CSS variable */
 	}
 
 	.icon-repair::before,
@@ -411,13 +377,13 @@ import 'swiper/css/effect-coverflow'; // Import coverflow effect CSS
 		content: '⚙️';
 		display: inline-block;
 		font-size: 1.5em;
-		color: rgb(var(--accent));
+		color: var(--link-color); /* Use link color for icons, or a specific icon color variable */
+		transition: color 0.3s ease;
 	}
 	.icon-web::before { content: '🌐'; }
 	.icon-stream::before { content: '🎬'; }
 	.icon-ai::before { content: '🧠'; }
 
-	/* Location/Map Section Styling */
 	.map-section h2,
 	.map-section p:first-of-type {
 		text-align: center;
@@ -428,171 +394,175 @@ import 'swiper/css/effect-coverflow'; // Import coverflow effect CSS
 	}
 	.map-container iframe {
 		max-width: 100%;
-		filter: grayscale(30%) contrast(90%);
+		filter: grayscale(var(--map-grayscale, 30%)) contrast(var(--map-contrast, 90%)); /* Allow theme override */
 		opacity: 0.9;
 		border-radius: 8px;
+		border: 1px solid var(--border-color);
+		transition: filter 0.3s ease, border-color 0.3s ease;
+	}
+	html.dark .map-container iframe {
+		--map-grayscale: 10%; /* Less grayscale in dark mode */
+		--map-contrast: 100%;
 	}
 	.map-container small {
 		display: block;
 		margin-top: 0.5rem;
 		font-size: 0.85em;
-		color: #aaa;
+		color: var(--text-color);
+		opacity: 0.7;
+		transition: color 0.3s ease;
 	}
 	.map-container small a {
-		color: #ccc;
+		color: var(--link-color);
 		text-decoration: underline;
 	}
 	.map-container small a:hover {
+		color: var(--accent-dark);
+	}
+	html.dark .map-container small a:hover {
 		color: white;
 	}
 
-	/* Vitrine Section Styling (Coverflow Carousel) */
+
 	#vitrine h2 {
 		text-align: center;
 		margin-bottom: 1rem;
 	}
 	.vitrine-intro {
 		text-align: center;
-		color: #d0d0d0;
+		color: var(--text-color);
+		opacity: 0.9;
 		margin-bottom: 2.5rem;
 		max-width: 60ch;
 		margin-left: auto;
 		margin-right: auto;
+		transition: color 0.3s ease;
 	}
-	/* Swiper Container */
 	.vitrine-swiper {
 		width: 100%;
-		padding-top: 20px; /* Add padding for potential overlap/shadows */
-		padding-bottom: 50px; /* Add padding for pagination and shadows */
-		position: relative; /* Needed for absolute positioning of nav buttons */
+		padding-top: 20px;
+		padding-bottom: 50px;
+		position: relative;
 	}
-	/* Individual Slide */
 	.swiper-slide {
 		background-position: center;
 		background-size: cover;
-		/* Adjust width for coverflow effect, especially with slidesPerView: 'auto' */
-		/* Let Swiper manage width based on 'auto', or set a fixed width */
-		width: 60%; /* Example: Adjust as needed */
-		max-width: 400px; /* Example: Max width for slides */
-		/* height: auto; */ /* Allow height to adjust */
-
-		/* Add some perspective for 3D effect if needed */
-		/* perspective: 1000px; */
-
-		/* Ensure content inside doesn't overflow weirdly */
+		width: 60%;
+		max-width: 400px;
 		overflow: hidden;
-		border-radius: 8px; /* Match item radius */
+		border-radius: 8px;
 	}
-
-	/* Make non-active slides slightly less opaque */
 	.swiper-slide:not(.swiper-slide-active) {
 		opacity: 0.7;
-		/* transform: scale(0.9); */ /* Optional: slightly scale down non-active slides */
 	}
-
-	/* Vitrine Item within Slide */
 	.swiper-slide .vitrine-item {
-		background-color: #23262d;
+		background-color: var(--card-bg-color); /* Use CSS variable */
 		border-radius: 8px;
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
-		width: 100%; /* Item takes full width of the slide */
-		/* Remove max-width here, control size via .swiper-slide width */
-		/* max-width: 450px; */
-		margin: 0 auto; /* Center item in slide */
-		box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Enhance shadow slightly */
-		transition: transform 0.3s ease, box-shadow 0.3s ease; /* Add transition for potential hover effects */
-		height: 100%; /* Ensure item fills slide height */
+		width: 100%;
+		margin: 0 auto;
+		box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+		transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+		height: 100%;
+		border: 1px solid var(--border-color); /* Add subtle border */
 	}
-	/* Optional: Add hover effect to the item itself */
 	.swiper-slide:hover .vitrine-item {
 		transform: scale(1.02);
 		box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
 	}
-
 	.vitrine-image {
 		width: 100%;
-		height: 200px; /* Maintain image height */
+		height: 200px;
 		object-fit: cover;
 		display: block;
-		border-bottom: 3px solid rgb(var(--accent));
+		border-bottom: 3px solid var(--link-color); /* Use CSS variable */
+		transition: border-color 0.3s ease;
 	}
 	.vitrine-content {
 		padding: 1.5rem;
 		flex-grow: 1;
 		display: flex;
 		flex-direction: column;
-		min-height: 150px; /* Ensure minimum content height */
+		min-height: 150px;
 	}
 	.vitrine-content h3 {
 		margin-top: 0;
-		color: rgb(var(--accent-light));
+		color: var(--heading-color); /* Use CSS variable */
 		margin-bottom: 0.75rem;
 	}
 	.vitrine-content p {
-		color: #c0c0c0;
+		color: var(--card-text-color); /* Use CSS variable */
 		flex-grow: 1;
 		margin-bottom: 1rem;
+		transition: color 0.3s ease;
 	}
 	.vitrine-link {
 		display: inline-block;
 		background-color: transparent;
-		color: rgb(var(--accent-light));
+		color: var(--link-color); /* Use CSS variable */
 		padding: 0.5rem 0;
 		border-radius: 4px;
 		text-decoration: none;
 		font-weight: bold;
-		transition: color 0.2s ease, background-color 0.2s ease;
+		transition: color 0.2s ease, background-color 0.2s ease, border-color 0.3s ease;
 		margin-top: auto;
-		border: 1px solid rgb(var(--accent));
+		border: 1px solid var(--link-color); /* Use CSS variable */
 		text-align: center;
 		max-width: 150px;
 	}
 	.vitrine-link:hover {
-		background-color: rgba(var(--accent), 0.2);
+		background-color: rgba(var(--accent), 0.2); /* Keep accent for hover */
+		color: var(--accent-dark);
+	}
+	html.dark .vitrine-link:hover {
+		background-color: rgba(var(--accent-light), 0.2);
 		color: white;
 	}
 
-	/* Swiper Navigation/Pagination Styling */
 	.swiper-pagination-bullet {
-		background-color: rgba(255, 255, 255, 0.5);
-		opacity: 1;
+		background-color: var(--text-color); /* Use CSS variable */
+		opacity: 0.5;
+		transition: background-color 0.3s ease;
 	}
 	.swiper-pagination-bullet-active {
-		background-color: rgb(var(--accent));
+		background-color: var(--link-color); /* Use CSS variable */
+		opacity: 1;
 	}
 	.swiper-button-prev,
 	.swiper-button-next {
-		color: rgb(var(--accent));
-		background-color: rgba(35, 38, 45, 0.5);
+		color: var(--link-color); /* Use CSS variable */
+		background-color: rgba(var(--card-bg-color-rgb, 35, 38, 45), 0.5); /* Use card bg with opacity */
 		border-radius: 50%;
 		width: 40px;
 		height: 40px;
-		transition: background-color 0.2s ease;
-		/* Position adjustments might be needed depending on the coverflow layout */
-		top: 50%; /* Vertically center */
-		transform: translateY(-50%); /* Adjust for exact centering */
+		transition: background-color 0.2s ease, color 0.3s ease;
+		top: 50%;
+		transform: translateY(-50%);
+	}
+	html.light .swiper-button-prev,
+	html.light .swiper-button-next {
+		/* Ensure card-bg-color-rgb is defined for light theme or use a fallback */
+		background-color: rgba(255, 255, 255, 0.5); /* Example for light theme */
 	}
 	.swiper-button-prev:hover,
 	.swiper-button-next:hover {
-		background-color: rgba(35, 38, 45, 0.8);
+		background-color: rgba(var(--card-bg-color-rgb, 35, 38, 45), 0.8);
+	}
+	html.light .swiper-button-prev:hover,
+	html.light .swiper-button-next:hover {
+		background-color: rgba(255, 255, 255, 0.8); /* Example for light theme */
 	}
 	.swiper-button-prev::after,
 	.swiper-button-next::after {
 		font-size: 1.2rem;
 		font-weight: bold;
 	}
-	/* Position arrows slightly outside */
-	.swiper-button-prev {
-		left: 10px; /* Adjust as needed */
-	}
-	.swiper-button-next {
-		right: 10px; /* Adjust as needed */
-	}
+	.swiper-button-prev { left: 10px; }
+	.swiper-button-next { right: 10px; }
 
 
-	/* Contact Form Styling */
 	#contact h2 {
 		text-align: center;
 	}
@@ -601,165 +571,128 @@ import 'swiper/css/effect-coverflow'; // Import coverflow effect CSS
 		margin-bottom: 2rem;
 	}
 	.contact-form {
-		background-color: #23262d;
+		background-color: var(--card-bg-color); /* Use CSS variable */
 		padding: 2rem;
 		border-radius: 8px;
 		max-width: 600px;
 		margin: 0 auto 2rem auto;
 		box-sizing: border-box;
-		transition: box-shadow 0.3s ease;
+		transition: box-shadow 0.3s ease, background-color 0.3s ease;
+		border: 1px solid var(--border-color); /* Add subtle border */
 	}
 	.contact-form:hover {
 		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 	}
-
 	.form-group {
 		margin-bottom: 1.5rem;
 	}
 	.form-group label {
 		display: block;
 		margin-bottom: 0.5rem;
-		color: #e0e0e0;
+		color: var(--text-color); /* Use CSS variable */
 		font-weight: bold;
+		transition: color 0.3s ease;
 	}
 	.form-group input,
 	.form-group textarea {
 		width: 100%;
 		padding: 0.8rem;
-		border: 1px solid #444;
-		background-color: #1a1c22;
-		color: white;
+		border: 1px solid var(--input-border-color); /* Use CSS variable */
+		background-color: var(--input-bg-color); /* Use CSS variable */
+		color: var(--input-text-color); /* Use CSS variable */
 		border-radius: 4px;
 		font-size: 1rem;
 		box-sizing: border-box;
+		transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 	}
 	.form-group input:focus,
 	.form-group textarea:focus {
 		outline: none;
-		border-color: rgb(var(--accent));
-		box-shadow: 0 0 0 2px rgba(var(--accent), 0.5);
+		border-color: var(--input-focus-border-color); /* Use CSS variable */
+		box-shadow: 0 0 0 2px var(--input-focus-shadow-color); /* Use CSS variable */
 	}
 	.submit-button {
 		display: block;
 		width: 100%;
 		padding: 0.9rem 1.5rem;
-		background-color: rgb(var(--accent));
-		color: white;
+		background-color: var(--button-bg-color); /* Use CSS variable */
+		color: var(--button-text-color); /* Use CSS variable */
 		border: none;
 		border-radius: 5px;
 		font-size: 1.1rem;
 		font-weight: bold;
 		cursor: pointer;
-		transition: background-color 0.2s ease;
+		transition: background-color 0.2s ease, color 0.3s ease;
 	}
 	.submit-button:hover {
-		background-color: rgb(var(--accent-dark));
+		background-color: var(--button-hover-bg-color); /* Use CSS variable */
 	}
 
-	/* Contact Buttons Styling */
 	.contact-buttons {
 		text-align: center;
 		margin-top: 2.5rem;
 	}
 	.contact-buttons p {
 		margin-bottom: 1rem;
-		color: #c0c0c0;
+		color: var(--text-color);
+		opacity: 0.8;
+		transition: color 0.3s ease;
 	}
 	.contact-button {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
 		gap: 0.6rem;
-		background-color: #333;
-		color: white;
+		background-color: var(--contact-button-bg); /* Use CSS variable */
+		color: var(--contact-button-text); /* Use CSS variable */
 		padding: 0.8rem 1.5rem;
 		border-radius: 5px;
 		text-decoration: none;
 		font-weight: bold;
 		margin: 0.5rem;
-		transition: background-color 0.2s ease, transform 0.1s ease;
-		border: 1px solid #555;
+		transition: background-color 0.2s ease, transform 0.1s ease, color 0.3s ease, border-color 0.3s ease;
+		border: 1px solid var(--contact-button-border); /* Use CSS variable */
 		min-width: 150px;
 	}
 	.contact-button:hover {
-		background-color: #444;
+		background-color: var(--contact-button-hover-bg); /* Use CSS variable */
 		transform: translateY(-2px);
 	}
 	.contact-button .icon {
 		font-size: 1.2em;
 		display: inline-block;
 	}
-	.contact-button.phone { background-color: #4CAF50; border-color: #388E3C; }
+	/* Specific button colors can be overridden or kept if desired */
+	.contact-button.phone { background-color: #4CAF50; border-color: #388E3C; color: white; }
 	.contact-button.phone:hover { background-color: #66BB6A; }
-	.contact-button.discord { background-color: #5865F2; border-color: #4650c1; }
+	.contact-button.discord { background-color: #5865F2; border-color: #4650c1; color: white; }
 	.contact-button.discord:hover { background-color: #707bf3; }
-	.contact-button.telegram { background-color: #0088cc; border-color: #006da3; }
+	.contact-button.telegram { background-color: #0088cc; border-color: #006da3; color: white; }
 	.contact-button.telegram:hover { background-color: #33aadd; }
 
-	/* Responsive adjustments */
+	/* Ensure specific button colors adapt if they are meant to be themed */
+	html.light .contact-button.phone { /* Adjust if needed for light theme */ }
+	html.light .contact-button.discord { /* Adjust if needed for light theme */ }
+	html.light .contact-button.telegram { /* Adjust if needed for light theme */ }
+
+
 	@media (max-width: 768px) {
-		/* Adjust slide width for smaller screens if needed */
-		.swiper-slide {
-			width: 70%; /* Example: Wider slides on smaller screens */
-		}
+		.swiper-slide { width: 70%; }
 	}
 
 	@media (max-width: 640px) {
-		section {
-			padding: 1.5rem;
-		}
-
-		/* Adjust slide width for smallest screens */
-		.swiper-slide {
-			width: 80%; /* Example: Even wider */
-		}
-		.vitrine-image {
-			height: 180px;
-		}
-		.vitrine-content {
-			padding: 1rem;
-			min-height: 120px; /* Adjust min height */
-		}
-		.vitrine-link {
-			max-width: none;
-			width: 100%;
-			padding: 0.7rem 1rem;
-		}
-		/* Adjust Swiper nav buttons for smaller screens */
-		.swiper-button-prev,
-		.swiper-button-next {
-			width: 35px;
-			height: 35px;
-		}
-		.swiper-button-prev::after,
-		.swiper-button-next::after {
-			font-size: 1rem;
-		}
+		section { padding: 1.5rem; }
+		.swiper-slide { width: 80%; }
+		.vitrine-image { height: 180px; }
+		.vitrine-content { padding: 1rem; min-height: 120px; }
+		.vitrine-link { max-width: none; width: 100%; padding: 0.7rem 1rem; }
+		.swiper-button-prev, .swiper-button-next { width: 35px; height: 35px; }
+		.swiper-button-prev::after, .swiper-button-next::after { font-size: 1rem; }
 		.swiper-button-prev { left: 5px; }
 		.swiper-button-next { right: 5px; }
-
-
-		.contact-form {
-			padding: 1.5rem;
-		}
-
-		.contact-buttons {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			gap: 1rem;
-		}
-
-		.contact-button {
-			width: 80%;
-			max-width: 300px;
-			margin: 0;
-			padding: 0.9rem 1rem;
-		}
-
-		.map-container iframe {
-			height: 250px;
-		}
+		.contact-form { padding: 1.5rem; }
+		.contact-buttons { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+		.contact-button { width: 80%; max-width: 300px; margin: 0; padding: 0.9rem 1rem; }
+		.map-container iframe { height: 250px; }
 	}
-
 </style>

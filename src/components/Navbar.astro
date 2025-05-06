@@ -1,5 +1,7 @@
 ---
 // src/components/Navbar.astro
+import ThemeSwitcher from './ThemeSwitcher.astro'; // Import the ThemeSwitcher
+
 const logoPath = "/favicon.svg"; // Using the existing favicon as the logo
 const siteTitle = "SOS-PC";
 ---
@@ -10,11 +12,14 @@ const siteTitle = "SOS-PC";
       <img src={logoPath} alt={`${siteTitle} Logo`} width="30" height="30" />
       <span>{siteTitle}</span>
     </a>
-    <div class="navbar-links">
-      <a href="/">Accueil</a>
-      <a href="/#services">Services</a>
-      <a href="/#contact">Contact</a>
-      <!-- Add more links as needed -->
+    <div class="navbar-controls">
+      <div class="navbar-links">
+        <a href="/">Accueil</a>
+        <a href="/#services">Services</a>
+        <a href="/#contact">Contact</a>
+        <!-- Add more links as needed -->
+      </div>
+      <ThemeSwitcher /> {/* Add the ThemeSwitcher component here */}
     </div>
   </div>
 </nav>
@@ -25,13 +30,14 @@ const siteTitle = "SOS-PC";
     top: 0;
     left: 0;
     width: 100%;
-    background-color: rgba(35, 38, 45, 0.9); /* Slightly transparent background */
+    background-color: var(--navbar-bg-color, rgba(35, 38, 45, 0.9)); /* Use CSS variable */
     backdrop-filter: blur(5px); /* Blur effect for background */
     padding: 0.8rem 1.5rem;
     z-index: 1000; /* Ensure it's above other content */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    border-bottom: 1px solid #444;
+    border-bottom: 1px solid var(--navbar-border-color, #444); /* Use CSS variable */
     box-sizing: border-box; /* Include padding in width calculation */
+    transition: background-color 0.3s ease, border-color 0.3s ease;
   }
 
   .navbar-container {
@@ -47,17 +53,25 @@ const siteTitle = "SOS-PC";
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    color: white;
+    color: var(--text-color, white); /* Use CSS variable */
     text-decoration: none;
     font-weight: bold;
     font-size: 1.2rem;
-    /* Ensure logo doesn't shrink too much if space is tight before wrapping */
     flex-shrink: 0;
     margin-right: 1rem; /* Add some space between logo and links */
+    transition: color 0.3s ease;
   }
 
   .navbar-logo img {
     display: block; /* Prevents extra space below image */
+  }
+
+  .navbar-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem; /* Space between links and switcher */
+    flex-wrap: wrap; /* Allow wrapping */
+    justify-content: center; /* Center when wrapped */
   }
 
   .navbar-links {
@@ -68,28 +82,33 @@ const siteTitle = "SOS-PC";
   }
 
   .navbar-links a {
-    color: #e0e0e0;
+    color: var(--navbar-link-color, #e0e0e0); /* Use CSS variable */
     text-decoration: none;
-    /* margin-left: 1.5rem; Removed fixed margin */
     transition: color 0.2s ease;
     padding: 0.2rem 0; /* Add some padding for touch targets */
   }
 
   .navbar-links a:hover {
-    color: rgb(var(--accent-light));
+    color: var(--accent-light); /* Keep accent for hover */
     text-decoration: underline;
   }
 
   /* Responsive adjustments for smaller screens */
-  @media (max-width: 640px) { /* Adjust breakpoint as needed */
+  @media (max-width: 768px) { /* Adjusted breakpoint for better layout with switcher */
     .navbar-container {
-      flex-direction: column; /* Stack logo and links vertically */
+      flex-direction: column; /* Stack logo and controls vertically */
       align-items: center; /* Center items */
-      gap: 0.8rem; /* Add space between logo and links block */
+      gap: 0.8rem; /* Add space between logo and controls block */
     }
 
     .navbar-logo {
       margin-right: 0; /* Remove right margin when stacked */
+    }
+
+    .navbar-controls {
+      flex-direction: column; /* Stack links and switcher */
+      gap: 0.8rem;
+      width: 100%;
     }
 
     .navbar-links {
@@ -99,7 +118,6 @@ const siteTitle = "SOS-PC";
     }
 
      .navbar-links a {
-       /* Ensure links don't have extra margin causing overflow */
        margin: 0;
      }
   }

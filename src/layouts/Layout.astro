@@ -1,6 +1,6 @@
 ---
-import Navbar from '../components/Navbar.astro'; // Import the Navbar component
-import AsciiBackground from '../components/AsciiBackground.astro'; // Import the background component
+import Navbar from '../components/Navbar.astro';
+import AsciiBackground from '../components/AsciiBackground.astro';
 
 interface Props {
 	title: string;
@@ -8,38 +8,52 @@ interface Props {
 }
 
 const { title, description = "SOS-PC - Solutions informatiques et web" } = Astro.props;
-
-// Estimate max navbar height for padding calculation (adjust if needed)
-const maxNavbarHeight = "120px"; // Increased potential height for stacked mobile nav
+const maxNavbarHeight = "120px";
 ---
 
 <!doctype html>
-<html lang="fr">
+<html lang="fr"> {/* The class 'dark' will be added here by JS */}
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="description" content={description} />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" /> {/* Ensure proper viewport scaling */}
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title} | SOS-PC</title>
 		<style define:vars={{ maxNavbarHeight }}>
-			/* Add scroll-padding-top to account for fixed navbar height */
 			html {
-				/* Use the variable for scroll padding */
 				scroll-padding-top: var(--maxNavbarHeight);
-				scroll-behavior: smooth; /* Optional: smooth scrolling for anchor links */
+				scroll-behavior: smooth;
 			}
 		</style>
+		{/* Inline script to set initial theme to prevent FOUC (Flash of Unstyled Content) */}
+		<script is:inline>
+			const theme = (() => {
+				if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+					return localStorage.getItem('theme');
+				}
+				if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+					return 'dark';
+				}
+				return 'light';
+			})();
+
+			if (theme === 'dark') {
+				document.documentElement.classList.add('dark');
+			} else {
+				document.documentElement.classList.remove('dark'); // Ensure light is default if no class
+			}
+			// Store the initial theme choice so other scripts can access it if needed
+      // window.initialTheme = theme; // Not strictly needed if ThemeSwitcher handles its own state
+		</script>
 	</head>
 	<body>
-    <AsciiBackground /> {/* Add the background component here */}
-		<Navbar /> {/* Add the Navbar component here */}
-		{/* Removed the old header */}
+    <AsciiBackground />
+		<Navbar />
 		<main>
 			<slot />
 		</main>
 		<footer>
-			<!-- Basic Footer -->
 			<p>&copy; {new Date().getFullYear()} SOS-PC. Tous droits réservés.</p>
 		</footer>
 	</body>
@@ -56,11 +70,77 @@ const maxNavbarHeight = "120px"; // Increased potential height for stacked mobil
 			white 60%
 		);
 
-		/* Define gradient colors - Darker Purplish Theme */
-		--gradient-color-1: #1A0F2A; /* Darker Deep Purple */
-		--gradient-color-2: #301E59; /* Darker Medium Purple */
-		--gradient-color-3: #4A2F8C; /* Darker Brighter Purple (less bright) */
-		--gradient-color-4: #251A40; /* Darker Muted Purple */
+		/* Light Theme Variables (Default) */
+		--bg-color: #F0F2F5; /* Light grey background */
+		--text-color: #1c1e21; /* Dark grey text */
+		--card-bg-color: #FFFFFF; /* White card background */
+		--card-text-color: #333333;
+		--border-color: #d1d5db; /* Light border color */
+		--navbar-bg-color: rgba(255, 255, 255, 0.85);
+		--navbar-border-color: #e5e7eb;
+		--navbar-link-color: #374151;
+		--footer-bg-color: rgba(243, 244, 246, 0.9);
+		--footer-text-color: #4b5563;
+		--theme-icon-color: #1c1e21; /* Icon color for light theme */
+		--main-bg-color: rgba(255, 255, 255, 0.95); /* Main content background for light theme */
+		--heading-color: rgb(var(--accent-dark)); /* Darker accent for headings in light mode */
+		--link-color: rgb(var(--accent));
+		--code-bg: rgba(var(--accent-dark), 0.1);
+		--code-color: rgb(var(--accent-dark));
+		--section-hover-bg: rgba(0, 0, 0, 0.03);
+		--section-separator-color: rgb(var(--accent-dark));
+		--button-bg-color: rgb(var(--accent));
+		--button-text-color: white;
+		--button-hover-bg-color: rgb(var(--accent-dark));
+		--input-bg-color: #f9fafb;
+		--input-text-color: #111827;
+		--input-border-color: #d1d5db;
+		--input-focus-border-color: rgb(var(--accent));
+		--input-focus-shadow-color: rgba(var(--accent), 0.3);
+		--contact-button-bg: #e5e7eb;
+		--contact-button-text: #1f2937;
+		--contact-button-border: #d1d5db;
+		--contact-button-hover-bg: #d1d5db;
+
+		/* Original Dark Theme Gradient Colors (can be used for ASCII background or specific elements) */
+		--gradient-color-1: #1A0F2A;
+		--gradient-color-2: #301E59;
+		--gradient-color-3: #4A2F8C;
+		--gradient-color-4: #251A40;
+	}
+
+	html.dark {
+		/* Dark Theme Variables */
+		--bg-color: var(--gradient-color-1); /* Using one of the dark purples for base */
+		--text-color: #e0e0e0; /* Light grey text for dark mode */
+		--card-bg-color: #23262d; /* Dark card background */
+		--card-text-color: #c0c0c0;
+		--border-color: #444; /* Darker border color */
+		--navbar-bg-color: rgba(35, 38, 45, 0.9);
+		--navbar-border-color: #444;
+		--navbar-link-color: #e0e0e0;
+		--footer-bg-color: rgba(35, 38, 45, 0.85);
+		--footer-text-color: #a0a0a0;
+		--theme-icon-color: white; /* Icon color for dark theme */
+		--main-bg-color: rgba(19, 21, 26, 0.85); /* Main content background for dark theme */
+		--heading-color: rgb(var(--accent-light)); /* Lighter accent for headings in dark mode */
+		--link-color: rgb(var(--accent-light));
+		--code-bg: rgba(var(--accent-light), 0.12);
+		--code-color: rgb(var(--accent-light));
+		--section-hover-bg: rgba(35, 38, 45, 0.3);
+		--section-separator-color: rgb(var(--accent));
+		--button-bg-color: rgb(var(--accent));
+		--button-text-color: white;
+		--button-hover-bg-color: rgb(var(--accent-dark));
+		--input-bg-color: #1a1c22;
+		--input-text-color: white;
+		--input-border-color: #444;
+		--input-focus-border-color: rgb(var(--accent-light));
+		--input-focus-shadow-color: rgba(var(--accent-light), 0.4);
+		--contact-button-bg: #333;
+		--contact-button-text: white;
+		--contact-button-border: #555;
+		--contact-button-hover-bg: #444;
 	}
 
 	/* Define the animation */
@@ -72,71 +152,57 @@ const maxNavbarHeight = "120px"; // Increased potential height for stacked mobil
 
 	html {
 		font-family: system-ui, sans-serif;
-		/* Removed static background color */
-		color: white;
+		background-color: var(--bg-color); /* Use CSS variable */
+		color: var(--text-color); /* Use CSS variable */
 		line-height: 1.6;
+		transition: background-color 0.3s ease, color 0.3s ease;
 	}
 	body {
 		display: flex;
 		flex-direction: column;
 		min-height: 100vh;
 		margin: 0;
-		/* Use the variable for body padding */
 		padding-top: var(--maxNavbarHeight);
-
-		/* Apply the animated gradient - Keep this or remove if ASCII is enough */
-		/* background: linear-gradient(
-			-45deg,
-			var(--gradient-color-1),
-			var(--gradient-color-2),
-			var(--gradient-color-3),
-			var(--gradient-color-4)
-		);
-		background-size: 400% 400%; */ /* Make the gradient large enough to move */
-		/* animation: gradientAnimation 30s ease infinite; */ /* Apply the animation - Slower (30s) */
-
-    /* Set a base background color for behind the canvas */
-    background-color: var(--gradient-color-1); /* Or a solid dark color */
+    /* AsciiBackground will handle its own background, body can have a fallback */
+    background-color: var(--bg-color); /* Fallback if AsciiBackground is transparent or fails */
 	}
 	main {
 		flex-grow: 1;
-		margin: 0 auto; /* Center content horizontally */
+		margin: 0 auto;
 		padding: 1.5rem;
-		width: 100%; /* Ensure main takes full width */
-		max-width: 100ch; /* Increased max-width for more space */
-		box-sizing: border-box; /* Include padding in width calculation */
-		/* Add a subtle background to main content for readability */
-		background-color: rgba(19, 21, 26, 0.85); /* Slightly less transparent dark background */
-		border-radius: 8px; /* Optional: round corners */
-		margin-top: 2rem; /* Add some space below the navbar */
-		margin-bottom: 2rem; /* Add some space above the footer */
-		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Optional: subtle shadow */
-    position: relative; /* Ensure main is layered above the fixed canvas */
+		width: 100%;
+		max-width: 100ch;
+		box-sizing: border-box;
+		background-color: var(--main-bg-color); /* Use CSS variable */
+		border-radius: 8px;
+		margin-top: 2rem;
+		margin-bottom: 2rem;
+		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    position: relative;
     z-index: 1;
+		transition: background-color 0.3s ease;
 	}
-	/* Remove old header styles */
-	/* header { ... } */
-	/* header nav a { ... } */
 
 	footer {
-		background-color: rgba(35, 38, 45, 0.85); /* Make footer slightly less transparent too */
+		background-color: var(--footer-bg-color); /* Use CSS variable */
 		padding: 1rem 1.5rem;
 		text-align: center;
-		/* margin-top: 2rem; Removed margin-top as main now has margin-bottom */
 		font-size: 0.9em;
-		color: #a0a0a0;
-    position: relative; /* Ensure footer is layered above the fixed canvas */
+		color: var(--footer-text-color); /* Use CSS variable */
+    position: relative;
     z-index: 1;
+		transition: background-color 0.3s ease, color 0.3s ease;
 	}
-	h1, h2, h3 {
-		color: rgb(var(--accent-light)); /* Keep accent color for headings */
+	h1, h2, h3, h4, h5, h6 {
+		color: var(--heading-color); /* Use CSS variable */
 		margin-top: 1.5em;
 		margin-bottom: 0.5em;
+		transition: color 0.3s ease;
 	}
 	h1 {
 		font-size: 2.5rem;
 		text-align: center;
-		margin-top: 0; /* Adjust margin for first heading */
+		margin-top: 0;
 	}
 	h2 {
 		font-size: 1.8rem;
@@ -151,6 +217,17 @@ const maxNavbarHeight = "120px"; // Increased potential height for stacked mobil
 		list-style: disc;
 		padding-left: 1.5rem;
 	}
+	a {
+		color: var(--link-color);
+		transition: color 0.3s ease;
+	}
+	a:hover {
+		color: var(--accent-dark); /* Consider a hover variable if needed */
+	}
+	html.dark a:hover {
+		color: white; /* Brighter hover for dark mode links */
+	}
+
 	code {
 		font-family:
 			Menlo,
@@ -161,32 +238,25 @@ const maxNavbarHeight = "120px"; // Increased potential height for stacked mobil
 			Bitstream Vera Sans Mono,
 			Courier New,
 			monospace;
-		background: rgba(var(--accent-light), 12%);
-		color: rgb(var(--accent-light));
+		background: var(--code-bg); /* Use CSS variable */
+		color: var(--code-color); /* Use CSS variable */
 		border-radius: 4px;
 		padding: 0.3em 0.4em;
 		font-size: 0.9em;
+		transition: background-color 0.3s ease, color 0.3s ease;
 	}
 
-	/* Responsive Font Size Adjustments (Example) */
+	/* Responsive Font Size Adjustments */
 	@media (max-width: 640px) {
-		h1 {
-			font-size: 2rem; /* Slightly smaller H1 on mobile */
-		}
-		h2 {
-			font-size: 1.6rem;
-		}
-		h3 {
-			font-size: 1.2rem;
-		}
-		body {
-			font-size: 0.95rem; /* Slightly smaller base font */
-		}
+		h1 { font-size: 2rem; }
+		h2 { font-size: 1.6rem; }
+		h3 { font-size: 1.2rem; }
+		body { font-size: 0.95rem; }
 		main {
 			margin-top: 1rem;
 			margin-bottom: 1rem;
 			padding: 1rem;
-			max-width: 95%; /* Use percentage for smaller screens */
+			max-width: 95%;
 		}
 	}
 </style>

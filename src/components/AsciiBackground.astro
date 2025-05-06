@@ -10,9 +10,10 @@
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -1; /* Place behind all other content */
-    opacity: 0.3; /* Start with low opacity, adjust as needed */
-    /* background-color: #1A0F2A; */ /* Optional: ensure canvas bg matches site bg */
+    z-index: 0; /* Changed from -1 to 0 */
+    opacity: 0.15; /* Adjusted for subtlety, can be increased if too faint */
+    /* The canvas itself should not have a background-color; it's for characters. */
+    /* The html/body background-color will show through. */
   }
 </style>
 
@@ -25,22 +26,37 @@
     if (!ctx) return;
 
     // --- Configuration ---
-    const charSet = ['.', ':', '-', '|', '*', '+', '~']; // Keep it sparse
-    const colors = ['#301934', '#4B0082', '#5A2D82', '#201525', '#1a1a1a']; // Dark purples and grays
-    const fontSize = 12; // Adjust as needed
-    const updateInterval = 100; // Milliseconds between update attempts (throttle)
-    const changeProbability = 0.005; // Chance for a character to change in an update cycle (very low)
+    const charSet = ['.', ':', '-', '|', '*', '+', '~'];
+    const fontSize = 12;
+    const updateInterval = 100; // Milliseconds
+    const changeProbability = 0.005;
+
+    // Theme-dependent colors
+    const lightThemeAsciiColors = ['#6c757d', '#5a6268', '#495057', '#343a40', '#212529']; // Darker grays for light bg
+    const darkThemeAsciiColors = ['#E0E0E0', '#BDBDBD', '#EEEEEE', '#F5F5F5', '#E8EAF6']; // Light grays and off-whites for dark bg
+
+    let currentAsciiColors: string[] = [];
 
     let cols: number;
     let rows: number;
     let grid: { char: string; color: string }[][] = [];
     let lastUpdateTime = 0;
 
+    function updateThemeColors() {
+      if (document.documentElement.classList.contains('dark')) {
+        currentAsciiColors = darkThemeAsciiColors;
+      } else {
+        currentAsciiColors = lightThemeAsciiColors;
+      }
+    }
+
     function setupGrid() {
+      updateThemeColors();
+
       const dpr = window.devicePixelRatio || 1;
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
-      ctx.scale(dpr, dpr); // Scale context for high-DPI displays
+      ctx.scale(dpr, dpr);
 
       cols = Math.floor(window.innerWidth / fontSize);
       rows = Math.floor(window.innerHeight / fontSize);
@@ -55,44 +71,34 @@
         for (let x = 0; x < cols; x++) {
           grid[y][x] = {
             char: charSet[Math.floor(Math.random() * charSet.length)],
-            color: colors[Math.floor(Math.random() * colors.length)],
+            color: currentAsciiColors[Math.floor(Math.random() * currentAsciiColors.length)],
           };
         }
       }
     }
 
     function drawGrid() {
-      // Clear canvas (simple approach first)
-      // Use canvas dimensions before scaling
+      // Clear with consideration for DPR
       ctx.clearRect(0, 0, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
-
-      // Could set a very dark background if needed
-      // ctx.fillStyle = '#100818';
-      // ctx.fillRect(0, 0, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
-
 
       for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
           const cell = grid[y][x];
           if (cell) {
-            ctx.fillStyle = cell.color;
-            // Add slight random offset for more organic feel (optional)
-            // const offsetX = (Math.random() - 0.5) * 0.5;
-            // const offsetY = (Math.random() - 0.5) * 0.5;
-            ctx.fillText(cell.char, x * fontSize /* + offsetX */, y * fontSize /* + offsetY */);
+            ctx.fillStyle = cell.color; // This color is now directly visible, modulated by canvas opacity
+            ctx.fillText(cell.char, x * fontSize, y * fontSize);
           }
         }
       }
     }
 
     function updateGrid() {
-       // Update only a small fraction of cells
        for (let y = 0; y < rows; y++) {
          for (let x = 0; x < cols; x++) {
            if (Math.random() < changeProbability) {
               grid[y][x] = {
                 char: charSet[Math.floor(Math.random() * charSet.length)],
-                color: colors[Math.floor(Math.random() * colors.length)],
+                color: currentAsciiColors[Math.floor(Math.random() * currentAsciiColors.length)],
               };
            }
          }
@@ -102,30 +108,40 @@
     function animate(timestamp: number) {
       const deltaTime = timestamp - lastUpdateTime;
 
-      // Throttle updates
       if (deltaTime > updateInterval) {
-        updateGrid(); // Update the character data
-        drawGrid();   // Redraw the grid
+        updateGrid();
+        drawGrid();
         lastUpdateTime = timestamp;
       }
-
-      requestAnimationFrame(animate); // Loop
+      requestAnimationFrame(animate);
     }
 
     // --- Initialization ---
     setupGrid();
 
-    // Debounced resize handler
     let resizeTimeout: number;
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimeout);
       resizeTimeout = window.setTimeout(() => {
         setupGrid();
-        // No need to call drawGrid here, animate loop will handle it
-      }, 250); // Debounce resize event
+      }, 250);
     });
 
-    // Start animation
+    const themeObserver = new MutationObserver((mutationsList) => {
+      for (const mutation of mutationsList) {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+          const previousColorsString = JSON.stringify(currentAsciiColors);
+          updateThemeColors();
+          if (JSON.stringify(currentAsciiColors) !== previousColorsString) {
+            setupGrid(); // Re-initialize and draw with new colors
+          }
+          break;
+        }
+      }
+    });
+
+    themeObserver.observe(document.documentElement, { attributes: true });
+
     requestAnimationFrame(animate);
   });
 </script>
