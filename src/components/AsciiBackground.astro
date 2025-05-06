@@ -1,0 +1,131 @@
+---
+// No server-side logic needed for the component itself
+---
+<canvas id="ascii-background-canvas"></canvas>
+
+<style>
+  #ascii-background-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Place behind all other content */
+    opacity: 0.3; /* Start with low opacity, adjust as needed */
+    /* background-color: #1A0F2A; */ /* Optional: ensure canvas bg matches site bg */
+  }
+</style>
+
+<script>
+  // Client-side script to handle the canvas animation
+  document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('ascii-background-canvas') as HTMLCanvasElement;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // --- Configuration ---
+    const charSet = ['.', ':', '-', '|', '*', '+', '~']; // Keep it sparse
+    const colors = ['#301934', '#4B0082', '#5A2D82', '#201525', '#1a1a1a']; // Dark purples and grays
+    const fontSize = 12; // Adjust as needed
+    const updateInterval = 100; // Milliseconds between update attempts (throttle)
+    const changeProbability = 0.005; // Chance for a character to change in an update cycle (very low)
+
+    let cols: number;
+    let rows: number;
+    let grid: { char: string; color: string }[][] = [];
+    let lastUpdateTime = 0;
+
+    function setupGrid() {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      ctx.scale(dpr, dpr); // Scale context for high-DPI displays
+
+      cols = Math.floor(window.innerWidth / fontSize);
+      rows = Math.floor(window.innerHeight / fontSize);
+
+      ctx.font = `${fontSize}px monospace`;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+
+      grid = [];
+      for (let y = 0; y < rows; y++) {
+        grid[y] = [];
+        for (let x = 0; x < cols; x++) {
+          grid[y][x] = {
+            char: charSet[Math.floor(Math.random() * charSet.length)],
+            color: colors[Math.floor(Math.random() * colors.length)],
+          };
+        }
+      }
+    }
+
+    function drawGrid() {
+      // Clear canvas (simple approach first)
+      // Use canvas dimensions before scaling
+      ctx.clearRect(0, 0, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
+
+      // Could set a very dark background if needed
+      // ctx.fillStyle = '#100818';
+      // ctx.fillRect(0, 0, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
+
+
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          const cell = grid[y][x];
+          if (cell) {
+            ctx.fillStyle = cell.color;
+            // Add slight random offset for more organic feel (optional)
+            // const offsetX = (Math.random() - 0.5) * 0.5;
+            // const offsetY = (Math.random() - 0.5) * 0.5;
+            ctx.fillText(cell.char, x * fontSize /* + offsetX */, y * fontSize /* + offsetY */);
+          }
+        }
+      }
+    }
+
+    function updateGrid() {
+       // Update only a small fraction of cells
+       for (let y = 0; y < rows; y++) {
+         for (let x = 0; x < cols; x++) {
+           if (Math.random() < changeProbability) {
+              grid[y][x] = {
+                char: charSet[Math.floor(Math.random() * charSet.length)],
+                color: colors[Math.floor(Math.random() * colors.length)],
+              };
+           }
+         }
+       }
+    }
+
+    function animate(timestamp: number) {
+      const deltaTime = timestamp - lastUpdateTime;
+
+      // Throttle updates
+      if (deltaTime > updateInterval) {
+        updateGrid(); // Update the character data
+        drawGrid();   // Redraw the grid
+        lastUpdateTime = timestamp;
+      }
+
+      requestAnimationFrame(animate); // Loop
+    }
+
+    // --- Initialization ---
+    setupGrid();
+
+    // Debounced resize handler
+    let resizeTimeout: number;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = window.setTimeout(() => {
+        setupGrid();
+        // No need to call drawGrid here, animate loop will handle it
+      }, 250); // Debounce resize event
+    });
+
+    // Start animation
+    requestAnimationFrame(animate);
+  });
+</script>

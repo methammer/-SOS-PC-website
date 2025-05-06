@@ -1,0 +1,192 @@
+---
+import Navbar from '../components/Navbar.astro'; // Import the Navbar component
+import AsciiBackground from '../components/AsciiBackground.astro'; // Import the background component
+
+interface Props {
+	title: string;
+	description?: string;
+}
+
+const { title, description = "SOS-PC - Solutions informatiques et web" } = Astro.props;
+
+// Estimate max navbar height for padding calculation (adjust if needed)
+const maxNavbarHeight = "120px"; // Increased potential height for stacked mobile nav
+---
+
+<!doctype html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content={description} />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" /> {/* Ensure proper viewport scaling */}
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title} | SOS-PC</title>
+		<style define:vars={{ maxNavbarHeight }}>
+			/* Add scroll-padding-top to account for fixed navbar height */
+			html {
+				/* Use the variable for scroll padding */
+				scroll-padding-top: var(--maxNavbarHeight);
+				scroll-behavior: smooth; /* Optional: smooth scrolling for anchor links */
+			}
+		</style>
+	</head>
+	<body>
+    <AsciiBackground /> {/* Add the background component here */}
+		<Navbar /> {/* Add the Navbar component here */}
+		{/* Removed the old header */}
+		<main>
+			<slot />
+		</main>
+		<footer>
+			<!-- Basic Footer -->
+			<p>&copy; {new Date().getFullYear()} SOS-PC. Tous droits réservés.</p>
+		</footer>
+	</body>
+</html>
+<style define:vars={{ maxNavbarHeight }} is:global>
+	:root {
+		--accent: 136, 58, 234;
+		--accent-light: 224, 204, 250;
+		--accent-dark: 49, 10, 101;
+		--accent-gradient: linear-gradient(
+			45deg,
+			rgb(var(--accent)),
+			rgb(var(--accent-light)) 30%,
+			white 60%
+		);
+
+		/* Define gradient colors - Darker Purplish Theme */
+		--gradient-color-1: #1A0F2A; /* Darker Deep Purple */
+		--gradient-color-2: #301E59; /* Darker Medium Purple */
+		--gradient-color-3: #4A2F8C; /* Darker Brighter Purple (less bright) */
+		--gradient-color-4: #251A40; /* Darker Muted Purple */
+	}
+
+	/* Define the animation */
+	@keyframes gradientAnimation {
+		0% { background-position: 0% 50%; }
+		50% { background-position: 100% 50%; }
+		100% { background-position: 0% 50%; }
+	}
+
+	html {
+		font-family: system-ui, sans-serif;
+		/* Removed static background color */
+		color: white;
+		line-height: 1.6;
+	}
+	body {
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh;
+		margin: 0;
+		/* Use the variable for body padding */
+		padding-top: var(--maxNavbarHeight);
+
+		/* Apply the animated gradient - Keep this or remove if ASCII is enough */
+		/* background: linear-gradient(
+			-45deg,
+			var(--gradient-color-1),
+			var(--gradient-color-2),
+			var(--gradient-color-3),
+			var(--gradient-color-4)
+		);
+		background-size: 400% 400%; */ /* Make the gradient large enough to move */
+		/* animation: gradientAnimation 30s ease infinite; */ /* Apply the animation - Slower (30s) */
+
+    /* Set a base background color for behind the canvas */
+    background-color: var(--gradient-color-1); /* Or a solid dark color */
+	}
+	main {
+		flex-grow: 1;
+		margin: 0 auto; /* Center content horizontally */
+		padding: 1.5rem;
+		width: 100%; /* Ensure main takes full width */
+		max-width: 100ch; /* Increased max-width for more space */
+		box-sizing: border-box; /* Include padding in width calculation */
+		/* Add a subtle background to main content for readability */
+		background-color: rgba(19, 21, 26, 0.85); /* Slightly less transparent dark background */
+		border-radius: 8px; /* Optional: round corners */
+		margin-top: 2rem; /* Add some space below the navbar */
+		margin-bottom: 2rem; /* Add some space above the footer */
+		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Optional: subtle shadow */
+    position: relative; /* Ensure main is layered above the fixed canvas */
+    z-index: 1;
+	}
+	/* Remove old header styles */
+	/* header { ... } */
+	/* header nav a { ... } */
+
+	footer {
+		background-color: rgba(35, 38, 45, 0.85); /* Make footer slightly less transparent too */
+		padding: 1rem 1.5rem;
+		text-align: center;
+		/* margin-top: 2rem; Removed margin-top as main now has margin-bottom */
+		font-size: 0.9em;
+		color: #a0a0a0;
+    position: relative; /* Ensure footer is layered above the fixed canvas */
+    z-index: 1;
+	}
+	h1, h2, h3 {
+		color: rgb(var(--accent-light)); /* Keep accent color for headings */
+		margin-top: 1.5em;
+		margin-bottom: 0.5em;
+	}
+	h1 {
+		font-size: 2.5rem;
+		text-align: center;
+		margin-top: 0; /* Adjust margin for first heading */
+	}
+	h2 {
+		font-size: 1.8rem;
+	}
+	h3 {
+		font-size: 1.4rem;
+	}
+	p {
+		margin-bottom: 1em;
+	}
+	ul {
+		list-style: disc;
+		padding-left: 1.5rem;
+	}
+	code {
+		font-family:
+			Menlo,
+			Monaco,
+			Lucida Console,
+			Liberation Mono,
+			DejaVu Sans Mono,
+			Bitstream Vera Sans Mono,
+			Courier New,
+			monospace;
+		background: rgba(var(--accent-light), 12%);
+		color: rgb(var(--accent-light));
+		border-radius: 4px;
+		padding: 0.3em 0.4em;
+		font-size: 0.9em;
+	}
+
+	/* Responsive Font Size Adjustments (Example) */
+	@media (max-width: 640px) {
+		h1 {
+			font-size: 2rem; /* Slightly smaller H1 on mobile */
+		}
+		h2 {
+			font-size: 1.6rem;
+		}
+		h3 {
+			font-size: 1.2rem;
+		}
+		body {
+			font-size: 0.95rem; /* Slightly smaller base font */
+		}
+		main {
+			margin-top: 1rem;
+			margin-bottom: 1rem;
+			padding: 1rem;
+			max-width: 95%; /* Use percentage for smaller screens */
+		}
+	}
+</style>

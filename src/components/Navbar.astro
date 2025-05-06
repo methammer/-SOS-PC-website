@@ -1,0 +1,106 @@
+---
+// src/components/Navbar.astro
+const logoPath = "/favicon.svg"; // Using the existing favicon as the logo
+const siteTitle = "SOS-PC";
+---
+
+<nav class="navbar">
+  <div class="navbar-container">
+    <a href="/" class="navbar-logo">
+      <img src={logoPath} alt={`${siteTitle} Logo`} width="30" height="30" />
+      <span>{siteTitle}</span>
+    </a>
+    <div class="navbar-links">
+      <a href="/">Accueil</a>
+      <a href="/#services">Services</a>
+      <a href="/#contact">Contact</a>
+      <!-- Add more links as needed -->
+    </div>
+  </div>
+</nav>
+
+<style>
+  .navbar {
+    position: fixed; /* Makes the navbar float */
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(35, 38, 45, 0.9); /* Slightly transparent background */
+    backdrop-filter: blur(5px); /* Blur effect for background */
+    padding: 0.8rem 1.5rem;
+    z-index: 1000; /* Ensure it's above other content */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid #444;
+    box-sizing: border-box; /* Include padding in width calculation */
+  }
+
+  .navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1100px; /* Limit width */
+    margin: 0 auto; /* Center container */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  }
+
+  .navbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.2rem;
+    /* Ensure logo doesn't shrink too much if space is tight before wrapping */
+    flex-shrink: 0;
+    margin-right: 1rem; /* Add some space between logo and links */
+  }
+
+  .navbar-logo img {
+    display: block; /* Prevents extra space below image */
+  }
+
+  .navbar-links {
+    display: flex; /* Use flexbox for links */
+    flex-wrap: wrap; /* Allow links to wrap */
+    gap: 0.5rem 1.5rem; /* Row and column gap */
+    justify-content: center; /* Center links when they wrap */
+  }
+
+  .navbar-links a {
+    color: #e0e0e0;
+    text-decoration: none;
+    /* margin-left: 1.5rem; Removed fixed margin */
+    transition: color 0.2s ease;
+    padding: 0.2rem 0; /* Add some padding for touch targets */
+  }
+
+  .navbar-links a:hover {
+    color: rgb(var(--accent-light));
+    text-decoration: underline;
+  }
+
+  /* Responsive adjustments for smaller screens */
+  @media (max-width: 640px) { /* Adjust breakpoint as needed */
+    .navbar-container {
+      flex-direction: column; /* Stack logo and links vertically */
+      align-items: center; /* Center items */
+      gap: 0.8rem; /* Add space between logo and links block */
+    }
+
+    .navbar-logo {
+      margin-right: 0; /* Remove right margin when stacked */
+    }
+
+    .navbar-links {
+      justify-content: center; /* Ensure links are centered */
+      width: 100%; /* Allow links container to take full width */
+      gap: 0.5rem 1rem; /* Adjust gap for smaller screens */
+    }
+
+     .navbar-links a {
+       /* Ensure links don't have extra margin causing overflow */
+       margin: 0;
+     }
+  }
+</style>
