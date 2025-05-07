@@ -9,7 +9,7 @@ interface Props {
 }
 
 const { title, description = "SOS-PC - Solutions informatiques et web" } = Astro.props;
-const maxNavbarHeight = "120px";
+const maxNavbarHeight = "80px"; // Adjusted navbar height
 ---
 
 <!doctype html>
@@ -18,9 +18,11 @@ const maxNavbarHeight = "120px";
 		<meta charset="UTF-8" />
 		<meta name="description" content={description} />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" type="image/png" href="/logo.png" /> {/* Updated favicon path */}
 		<meta name="generator" content={Astro.generator} />
 		<title>{title} | SOS-PC</title>
+		{/* Add Open Graph og:image meta tag if not already present, or update existing one */}
+		<meta property="og:image" content="/logo.png" /> {/* Updated OG image path */}
 		<style define:vars={{ maxNavbarHeight }}>
 			html {
 				scroll-padding-top: var(--maxNavbarHeight);
@@ -225,7 +227,7 @@ const maxNavbarHeight = "120px";
 		margin: 0 auto;
 		padding: 1.5rem;
 		width: 100%;
-		max-width: 100ch;
+		max-width: 120ch; /* UPDATED: Decreased max-width from 140ch to 120ch */
 		box-sizing: border-box;
 		background-color: var(--main-bg-color); /* Use CSS variable */
 		border-radius: 8px;
@@ -310,7 +312,7 @@ const maxNavbarHeight = "120px";
 			margin-top: 1rem;
 			margin-bottom: 1rem;
 			padding: 1rem;
-			max-width: 95%;
+			max-width: 95%; /* On small screens, use percentage for better fit */
 		}
 	}
 </style>

@@ -1,72 +1,122 @@
 ---
 // src/components/ThemeSwitcher.astro
 ---
-<button id="theme-toggle" aria-label="Toggle theme">
-  <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-  <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+<button id="theme-toggle" aria-label="Changer de thème" title="Changer de thème">
+  <svg class="sun-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+    <path d="M12 4c-4.418 0-8 3.582-8 8s3.582 8 8 8 8-3.582 8-8-3.582-8-8-8zm0 14c-3.313 0-6-2.687-6-6s2.687-6 6-6 6 2.687 6 6-2.687 6-6 6zm0-10c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zM4.929 4.929L6.343 6.343m11.314 11.314l1.414 1.414m-12.728 0l1.414-1.414m11.314-11.314l-1.414-1.414M12 2v2m0 16v2M2 12h2m16 0h2"/>
+    <path d="M12 7a5 5 0 100 10 5 5 0 000-10z" fill-opacity="0.5"/>
+  </svg>
+  <svg class="moon-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24" style="display:none;">
+    <path d="M12 2.042c-5.514 0-10 4.486-10 10s4.486 10 10 10c.264 0 .524-.012.78-.035-2.633-.975-4.58-3.508-4.58-6.465s1.947-5.49 4.58-6.465c-.256-.023-.516-.035-.78-.035zm5.657 3.071a8.003 8.003 0 00-6.791 12.775A9.936 9.936 0 0017.657 5.113z"/>
+  </svg>
 </button>
-
-<script is:inline>
-  // src/components/ThemeSwitcher.astro <script>
-  const themeToggle = document.getElementById('theme-toggle');
-  const sunIcon = themeToggle.querySelector('.sun-icon');
-  const moonIcon = themeToggle.querySelector('.moon-icon');
-  const documentElement = document.documentElement;
-
-  const applyTheme = (theme) => {
-    if (theme === 'dark') {
-      documentElement.classList.add('dark');
-      sunIcon.style.display = 'block';
-      moonIcon.style.display = 'none';
-    } else {
-      documentElement.classList.remove('dark');
-      sunIcon.style.display = 'none';
-      moonIcon.style.display = 'block';
-    }
-  };
-
-  const toggleTheme = () => {
-    const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    localStorage.setItem('theme', newTheme);
-    applyTheme(newTheme);
-  };
-
-  // Initial theme setup
-  const savedTheme = localStorage.getItem('theme');
-  const preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  const initialTheme = savedTheme || preferredTheme;
-  applyTheme(initialTheme);
-
-  themeToggle.addEventListener('click', toggleTheme);
-</script>
 
 <style>
   #theme-toggle {
     background: none;
     border: none;
     cursor: pointer;
-    padding: 0.5rem;
+    padding: 0.5rem; /* Adjust padding as needed */
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--theme-icon-color, white); /* Use CSS variable for icon color */
-    transition: background-color 0.2s ease;
+    color: var(--theme-icon-color);
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
   }
-
   #theme-toggle:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(128,128,128,0.1); /* Subtle hover effect */
   }
-
-  #theme-toggle svg {
-    width: 20px; /* Adjust size as needed */
-    height: 20px;
+  .sun-icon, .moon-icon {
+    width: 22px; /* Slightly smaller icon */
+    height: 22px;
   }
-
-  /* Hide one icon by default based on theme (JS will toggle) */
-  .dark .sun-icon { display: block; }
-  .dark .moon-icon { display: none; }
-  html:not(.dark) .sun-icon { display: none; }
-  html:not(.dark) .moon-icon { display: block; }
+  /* These CSS rules define the default visibility based on the .dark class on <html>.
+     The JavaScript will override these with inline styles for active control. */
+  html.dark #theme-toggle .sun-icon {
+    display: none;
+  }
+  html.dark #theme-toggle .moon-icon {
+    display: block;
+  }
+  html:not(.dark) #theme-toggle .sun-icon {
+    display: block;
+  }
+  html:not(.dark) #theme-toggle .moon-icon {
+    display: none;
+  }
 </style>
+
+<script>
+  // src/components/ThemeSwitcher.astro script
+  console.log('[ThemeSwitcher] Script loaded.');
+
+  function setupThemeToggle() {
+    console.log('[ThemeSwitcher] setupThemeToggle CALLED.');
+    const themeToggleButton = document.getElementById('theme-toggle');
+    
+    if (!themeToggleButton) {
+      console.error('[ThemeSwitcher] CRITICAL: Theme toggle button (#theme-toggle) NOT FOUND in the DOM when setupThemeToggle was called.');
+      return;
+    }
+    console.log('[ThemeSwitcher] Theme toggle button FOUND:', themeToggleButton);
+
+    if (themeToggleButton.dataset.themeListenersAttached === 'true') {
+      console.log('[ThemeSwitcher] Listeners already attached to this button instance. Re-validating icon state.');
+      // Re-run icon update logic in case the theme changed by other means or for initial setup consistency
+      const sunIconUpdate = themeToggleButton.querySelector('.sun-icon');
+      const moonIconUpdate = themeToggleButton.querySelector('.moon-icon');
+      const isDarkCurrent = document.documentElement.classList.contains('dark');
+      if (sunIconUpdate && moonIconUpdate) {
+        sunIconUpdate.style.display = isDarkCurrent ? 'none' : 'block';
+        moonIconUpdate.style.display = isDarkCurrent ? 'block' : 'none';
+        console.log(`[ThemeSwitcher] Icons re-validated. Sun: ${sunIconUpdate.style.display}, Moon: ${moonIconUpdate.style.display}`);
+      }
+      return; 
+    }
+
+    const sunIcon = themeToggleButton.querySelector('.sun-icon');
+    const moonIcon = themeToggleButton.querySelector('.moon-icon');
+
+    if (!sunIcon) console.error('[ThemeSwitcher] Sun icon (.sun-icon) NOT FOUND within the button.');
+    if (!moonIcon) console.error('[ThemeSwitcher] Moon icon (.moon-icon) NOT FOUND within the button.');
+    if (!sunIcon || !moonIcon) return;
+    
+    console.log('[ThemeSwitcher] Icons FOUND. Sun:', sunIcon, 'Moon:', moonIcon);
+
+    function _updateIcons(isDark) {
+      console.log(`[ThemeSwitcher] _updateIcons called. Target theme isDark: ${isDark}`);
+      // Directly use the sunIcon and moonIcon variables captured in this closure
+      sunIcon.style.display = isDark ? 'none' : 'block';
+      moonIcon.style.display = isDark ? 'block' : 'none';
+      console.log(`[ThemeSwitcher] Icons display set - Sun: ${sunIcon.style.display}, Moon: ${moonIcon.style.display}`);
+    }
+
+    const initialIsDark = document.documentElement.classList.contains('dark');
+    console.log(`[ThemeSwitcher] Initial theme check from classList: document.documentElement isDark = ${initialIsDark}`);
+    _updateIcons(initialIsDark);
+
+    themeToggleButton.addEventListener('click', () => {
+      console.log('[ThemeSwitcher] Button CLICKED.');
+      const isDarkNow = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDarkNow ? 'dark' : 'light');
+      console.log(`[ThemeSwitcher] Theme toggled. New theme isDark: ${isDarkNow}. Stored in localStorage: ${localStorage.getItem('theme')}`);
+      _updateIcons(isDarkNow);
+    });
+    
+    themeToggleButton.dataset.themeListenersAttached = 'true';
+    console.log('[ThemeSwitcher] Click listener ATTACHED and button marked (data-theme-listeners-attached="true").');
+  }
+
+  document.addEventListener('astro:page-load', () => {
+    console.log('[ThemeSwitcher] astro:page-load event FIRED. Calling setupThemeToggle.');
+    setupThemeToggle();
+  });
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('[ThemeSwitcher] DOMContentLoaded event FIRED. Calling setupThemeToggle.');
+    setupThemeToggle();
+  });
+  
+  console.log('[ThemeSwitcher] Event listeners (astro:page-load, DOMContentLoaded) REGISTERED.');
+</script>

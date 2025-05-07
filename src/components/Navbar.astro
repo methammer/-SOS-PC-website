@@ -1,226 +1,423 @@
 ---
-// src/components/Navbar.astro
 import ThemeSwitcher from './ThemeSwitcher.astro';
 
-const logoPath = "/favicon.svg";
-const siteTitle = "SOS-PC";
+// Define navigation links - adjust hrefs and text as needed
+const navLinks = [
+  { href: "/", text: "Accueil", id: "home" },
+  { href: "/#services", text: "Services", id: "services" },
+  { href: "#vitrine", text: "Portfolio", id: "vitrine" }, // Reverted to intended values
+  { href: "/#contact", text: "Contact", id: "contact" },
+];
+
+// You can retrieve this from a global config or define it here
+const siteTitle = "SOS-PC"; 
 ---
-
-<nav class="navbar">
-  <div class="navbar-container">
-    <a href="/" class="navbar-logo">
-      <img src={logoPath} alt={`${siteTitle} Logo`} width="30" height="30" />
-      <span>{siteTitle}</span>
-    </a>
-
-    <button id="navbar-menu-toggle-button" class="navbar-menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
-      <svg class="hamburger-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg>
-      <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="display: none;"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg>
+<nav id="main-navbar" aria-label="Navigation principale">
+  <div class="nav-container">
+    <div class="logo-container">
+      <img src="/logo.png" alt={`${siteTitle} Logo`} id="navbar-logo" />
+      <a href="/" class="logo-text-anchor" aria-label={`Retour à la page d'accueil de ${siteTitle}`}>
+        <span class="logo-text">{siteTitle}</span>
+      </a>
+    </div>
+    
+    <button class="hamburger-menu" aria-label="Ouvrir le menu de navigation" aria-expanded="false" aria-controls="nav-links-list">
+      <span class="hamburger-icon"></span>
     </button>
 
-    <div id="navbar-collapsible-content" class="navbar-collapsible-content">
-      <div class="navbar-links">
-        <a href="/">Accueil</a>
-        <a href="/#services">Services</a>
-        <a href="/#contact">Contact</a>
-        <!-- Add more links as needed -->
-      </div>
+    <ul class="nav-links" id="nav-links-list">
+      {navLinks.map(link => (
+        <li><a href={link.href} data-navid={link.id}>{link.text}</a></li>
+      ))}
+    </ul>
+
+    <div class="theme-switcher-container">
       <ThemeSwitcher />
     </div>
   </div>
 </nav>
 
-<script>
-  // src/components/Navbar.astro <script>
-  const menuToggleButton = document.getElementById('navbar-menu-toggle-button');
-  const collapsibleContent = document.getElementById('navbar-collapsible-content');
-  const thresholdWidth = 768; // Breakpoint for showing/hiding menu toggle button
-  
-  if (menuToggleButton && collapsibleContent) {
-    const hamburgerIcon = menuToggleButton.querySelector('.hamburger-icon');
-    const closeIcon = menuToggleButton.querySelector('.close-icon');
-
-    function updateMenuVisualState(isOpen) {
-      collapsibleContent.classList.toggle('is-open', isOpen);
-      menuToggleButton.setAttribute('aria-expanded', isOpen.toString());
-      if (hamburgerIcon) hamburgerIcon.style.display = isOpen ? 'none' : 'block';
-      if (closeIcon) closeIcon.style.display = isOpen ? 'block' : 'none';
-    }
-
-    function handleMenuToggleClick() {
-      const isOpen = collapsibleContent.classList.contains('is-open');
-      updateMenuVisualState(!isOpen);
-    }
-
-    function handleMenuLinkClick() {
-      if (collapsibleContent.classList.contains('is-open')) {
-        updateMenuVisualState(false);
-      }
-    }
-
-    menuToggleButton.addEventListener('click', handleMenuToggleClick);
-    
-    const links = collapsibleContent.querySelectorAll('a');
-    links.forEach(link => {
-      link.addEventListener('click', handleMenuLinkClick);
-    });
-
-    function manageMenuButtonVisibilityAndState() {
-      const isOpen = collapsibleContent.classList.contains('is-open');
-
-      if (window.innerWidth <= thresholdWidth) {
-        menuToggleButton.style.display = 'flex';
-        // Ensure icons are correct based on current menu state
-        if (hamburgerIcon) hamburgerIcon.style.display = isOpen ? 'none' : 'block';
-        if (closeIcon) closeIcon.style.display = isOpen ? 'block' : 'none';
-      } else {
-        menuToggleButton.style.display = 'none';
-        // If button is hidden (larger screen), ensure menu is closed
-        if (isOpen) {
-          updateMenuVisualState(false);
-        }
-      }
-    }
-
-    // Initial check on load
-    manageMenuButtonVisibilityAndState();
-
-    // Listen for window resize events
-    window.addEventListener('resize', manageMenuButtonVisibilityAndState);
-
-  } else {
-    console.error('Navbar menu elements not found. Mobile menu script not fully initialized.');
+<style define:vars={{ siteTitle }}>
+  :root {
+    --navbar-internal-height: var(--maxNavbarHeight, 80px); 
   }
-</script>
 
-<style>
-  .navbar {
+  nav#main-navbar {
+    background-color: var(--navbar-bg-color);
+    border-bottom: 1px solid var(--navbar-border-color);
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    background-color: var(--navbar-bg-color, rgba(35, 38, 45, 0.9));
-    backdrop-filter: blur(5px);
-    padding: 0.8rem 1.5rem;
     z-index: 1000;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    border-bottom: 1px solid var(--navbar-border-color, #444);
     box-sizing: border-box;
+    height: var(--navbar-internal-height);
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
     transition: background-color 0.3s ease, border-color 0.3s ease;
   }
 
-  .navbar-container {
+  .nav-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 1100px;
+    width: 100%;
+    max-width: var(--max-content-width, 1200px);
     margin: 0 auto;
-    flex-wrap: wrap; 
   }
 
-  .navbar-logo {
+  .logo-container { /* Changed from <a> to <div> */
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    color: var(--text-color, white);
+  }
+
+  #navbar-logo {
+    height: calc(var(--navbar-internal-height) - 30px);
+    max-height: 50px;
+    width: auto;
+    cursor: pointer; /* For bounce animation */
+    margin-right: 10px;
+    transition: transform 0.3s ease;
+  }
+  
+  .logo-text-anchor {
     text-decoration: none;
+    display: inline-flex; /* Aligns inner content if any, and behaves well in flex parent */
+    align-items: center;
+  }
+
+  .logo-text {
+    font-size: clamp(1.2rem, 3vw, 1.5rem);
     font-weight: bold;
-    font-size: 1.2rem;
-    flex-shrink: 0;
+    color: var(--heading-color);
     transition: color 0.3s ease;
   }
 
-  .navbar-logo img {
-    display: block;
+  .logo-text-anchor:hover .logo-text {
+    color: var(--accent);
+  }
+  html.dark .logo-text-anchor:hover .logo-text {
+    color: rgb(var(--accent-light));
   }
 
-  .navbar-menu-toggle {
-    display: none; /* Initially hidden; JS will manage visibility to 'flex' or 'none' */
+  #navbar-logo.bounce {
+    animation: logoBounce 0.7s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  }
+
+  @keyframes logoBounce {
+    0%, 100% { transform: scale(1) translateY(0); }
+    10% { transform: scale(1.1, 0.9) translateY(0); }
+    30% { transform: scale(0.9, 1.1) translateY(-10px); }
+    50% { transform: scale(1.05, 0.95) translateY(0); }
+    70% { transform: scale(1) translateY(-5px); }
+    90% { transform: scale(1) translateY(0); }
+  }
+
+  .nav-links {
+    list-style: none;
+    display: flex;
+    gap: clamp(1rem, 2.5vw, 1.75rem);
+    margin: 0;
+    align-items: center; 
+  }
+
+  .nav-links a {
+    text-decoration: none;
+    color: var(--navbar-link-color);
+    font-weight: 500;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    padding: 0.5rem 0.25rem;
+    position: relative;
+    transition: color 0.3s ease;
+  }
+
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--accent);
+    transition: width 0.3s ease-in-out;
+  }
+
+  .nav-links a:hover,
+  .nav-links a.active {
+    color: var(--accent);
+  }
+  html.dark .nav-links a:hover,
+  html.dark .nav-links a.active {
+    color: rgb(var(--accent-light));
+  }
+
+  .nav-links a:hover::after,
+  .nav-links a.active::after {
+    width: 100%;
+  }
+  
+  .theme-switcher-container {
+    display: flex;
+    align-items: center;
+  }
+
+  .hamburger-menu {
+    display: none; 
     background: none;
     border: none;
-    color: var(--text-color);
     cursor: pointer;
-    padding: 0.5rem;
-    /* align-items, justify-content, order are set in media query for when it's visible */
+    padding: 10px;
+    z-index: 1001; 
   }
 
-  .navbar-menu-toggle svg {
+  .hamburger-icon {
+    display: block;
     width: 24px;
-    height: 24px;
-    display: block; 
+    height: 2px;
+    background-color: var(--navbar-link-color);
+    position: relative;
+    transition: background-color 0.3s ease;
   }
 
-  .navbar-collapsible-content {
-    display: flex; 
-    align-items: center;
-    gap: 1rem; 
+  .hamburger-icon::before,
+  .hamburger-icon::after {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 2px;
+    background-color: var(--navbar-link-color);
+    left: 0;
+    transition: transform 0.3s ease, top 0.3s ease, bottom 0.3s ease, background-color 0.3s ease;
   }
 
-  .navbar-links {
-    display: flex; 
-    gap: 0.5rem 1.5rem; 
+  .hamburger-icon::before {
+    top: -7px;
   }
 
-  .navbar-links a {
-    color: var(--navbar-link-color, #e0e0e0);
-    text-decoration: none;
-    transition: color 0.2s ease;
-    padding: 0.2rem 0;
+  .hamburger-icon::after {
+    bottom: -7px;
   }
 
-  .navbar-links a:hover {
-    color: var(--accent-light);
-    text-decoration: underline;
+  .hamburger-menu.active .hamburger-icon {
+    background-color: transparent; 
   }
+  .hamburger-menu.active .hamburger-icon::before {
+    top: 0;
+    transform: rotate(45deg);
+  }
+  .hamburger-menu.active .hamburger-icon::after {
+    bottom: 0;
+    transform: rotate(-45deg);
+  }
+  html.dark .hamburger-icon,
+  html.dark .hamburger-icon::before,
+  html.dark .hamburger-icon::after {
+    background-color: var(--navbar-link-color); 
+  }
+
 
   @media (max-width: 768px) {
-    .navbar-menu-toggle {
-      /* display: flex; <-- This is now controlled by JavaScript */
-      /* Properties for when JS makes it visible on small screens */
-      align-items: center; 
-      justify-content: center;
-      order: 1; 
+    nav#main-navbar {
+      padding: 0 1rem;
+    }
+    #navbar-logo {
+       height: calc(var(--navbar-internal-height) - 36px);
+       max-height: 40px;
     }
 
-    .navbar-collapsible-content {
-      width: 100%;
+    .hamburger-menu {
+      display: block; 
+      order: 3; 
+    }
+    
+    .theme-switcher-container {
       order: 2; 
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
-      flex-direction: column; 
-      align-items: center; 
-      gap: 0; 
-      padding: 0 1rem; 
+      margin-left: auto; 
     }
 
-    .navbar-collapsible-content.is-open {
-      max-height: 70vh; 
-      padding: 1rem 1rem 1.5rem; 
-      border-top: 1px solid var(--navbar-border-color, #444);
-      margin-top: 0.8rem;
-    }
-
-    .navbar-links {
-      flex-direction: column; 
-      align-items: center; 
+    .nav-links { 
+      position: absolute;
+      top: var(--navbar-internal-height); 
+      left: 0;
       width: 100%;
-      gap: 0.8rem; 
-      margin-bottom: 1rem; 
+      background-color: var(--navbar-bg-color);
+      border-top: 1px solid var(--navbar-border-color);
+      flex-direction: column; 
+      align-items: center; 
+      gap: 0.5rem;
+      
+      max-height: 0; 
+      overflow: hidden;
+      padding-top: 0; 
+      padding-bottom: 0; 
+      
+      transition: max-height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                  padding-top 0.4s ease, 
+                  padding-bottom 0.4s ease;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
 
-    .navbar-links a {
-      padding: 0.5rem 0; 
+    .nav-links.nav-active {
+      max-height: 500px; 
+      padding-top: 1rem; 
+      padding-bottom: 1rem; 
+    }
+
+    .nav-links a {
+      font-size: 1.1rem; 
+      padding: 0.75rem 1rem;
       width: 100%;
       text-align: center;
-      border-radius: 4px;
     }
-    .navbar-links a:hover {
-      background-color: rgba(128,128,128,0.1); 
+    .nav-links a::after { 
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 0.5rem; 
     }
+  }
 
-    .navbar-collapsible-content > :global(.theme-switcher-wrapper) { 
-      margin-top: 0.5rem;
+  @media (max-width: 480px) {
+    .logo-text-anchor { 
+      /* Styles for the anchor if needed on small screens */
+    }
+    .logo-text { 
+      /* display: none;  <- This line was removed */
+      /* You might want to adjust font-size or other properties here if needed */
+      font-size: clamp(1rem, 2.5vw, 1.2rem); /* Example: slightly smaller font */
+    }
+    .nav-links a {
+        font-size: 1rem;
     }
   }
 </style>
+
+<script>
+  // VERY IMPORTANT: Check if this log appears in the console
+  console.log('Navbar.astro SCRIPT TAG EXECUTED'); 
+
+  function initializeNavbar() {
+    console.log('DOMContentLoaded event fired. Initializing navbar script.');
+
+    const logoElement = document.getElementById('navbar-logo'); // This is the <img> tag
+    const hamburgerButton = document.querySelector('.hamburger-menu');
+    const navLinksList = document.getElementById('nav-links-list');
+
+    console.log('Selected hamburgerButton:', hamburgerButton);
+    console.log('Selected navLinksList:', navLinksList);
+
+    if (logoElement) {
+      console.log('Logo element found. Attaching click listener.');
+      logoElement.addEventListener('click', () => {
+        logoElement.classList.remove('bounce');
+        void logoElement.offsetWidth; 
+        logoElement.classList.add('bounce');
+      });
+      logoElement.addEventListener('animationend', () => {
+        logoElement.classList.remove('bounce');
+      });
+    } else {
+      console.error('Logo element #navbar-logo not found!');
+    }
+
+    if (hamburgerButton && navLinksList) {
+      console.log('Hamburger button and nav links list found. Attaching click listener to hamburger.');
+      hamburgerButton.addEventListener('click', () => {
+        console.log('Hamburger clicked!'); 
+        
+        const isExpanded = navLinksList.classList.toggle('nav-active');
+        console.log('navLinksList class "nav-active" toggled. Is now expanded:', isExpanded);
+        
+        hamburgerButton.classList.toggle('active');
+        console.log('hamburgerButton class "active" toggled.');
+        
+        hamburgerButton.setAttribute('aria-expanded', String(isExpanded));
+        console.log('hamburgerButton aria-expanded set to:', String(isExpanded));
+        
+        if (isExpanded) {
+          console.log('Menu is expanded. Attaching click listeners to nav links to close menu.');
+          const links = navLinksList.querySelectorAll('a');
+          links.forEach(link => {
+            const closeMenuOnLinkClick = () => {
+              console.log('Nav link clicked, closing menu.');
+              navLinksList.classList.remove('nav-active');
+              hamburgerButton.classList.remove('active');
+              hamburgerButton.setAttribute('aria-expanded', 'false');
+            };
+            link.addEventListener('click', closeMenuOnLinkClick, { once: true });
+          });
+        }
+      });
+    } else {
+      if (!hamburgerButton) {
+        console.error('Hamburger button .hamburger-menu not found!');
+      }
+      if (!navLinksList) {
+        console.error('Nav links list #nav-links-list not found!');
+      }
+    }
+
+    function updateActiveNavLink() {
+      const currentPath = window.location.pathname + window.location.hash;
+      const navLinkElements = document.querySelectorAll('.nav-links a');
+      
+      navLinkElements.forEach(link => {
+        const linkHref = link.getAttribute('href');
+        // For same-page hash links (e.g., #vitrine), ensure they are correctly matched
+        // when the pathname is / and hash is present.
+        let normalizedLinkHref = linkHref;
+        if (linkHref.startsWith('#') && currentPath.startsWith('/')) {
+           // Prepend current pathname if it's just a hash, to match against currentPath
+           // Or, more simply, if linkHref is just a hash, compare it with window.location.hash
+        }
+
+
+        const normalizedCurrentPath = currentPath.endsWith('/') && currentPath.length > 1 ? currentPath.slice(0, -1) : currentPath;
+        normalizedLinkHref = linkHref.endsWith('/') && linkHref.length > 1 ? linkHref.slice(0, -1) : linkHref;
+        
+        // Handle matching for root path and hash links correctly
+        let isActive = false;
+        if (linkHref.startsWith('#')) { // For links like #vitrine
+            isActive = window.location.hash === linkHref && (normalizedCurrentPath === '/' || normalizedCurrentPath === '' || normalizedCurrentPath === '/index.html');
+        } else { // For links like /#services or /
+            isActive = normalizedLinkHref === normalizedCurrentPath || 
+                       (normalizedLinkHref === "/" && (normalizedCurrentPath === "/index.html" || normalizedCurrentPath === ""));
+        }
+
+
+        if (isActive) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+    }
+    
+    console.log('Calling updateActiveNavLink initially.');
+    updateActiveNavLink();
+    window.addEventListener('hashchange', () => {
+      console.log('hashchange event detected. Calling updateActiveNavLink.');
+      updateActiveNavLink();
+    });
+    console.log('Navbar script initialization complete.');
+  }
+
+  // Astro specific: Use astro:page-load for subsequent page navigations
+  // but also ensure it runs on initial load if DOMContentLoaded fires first or if astro:page-load is more reliable for Astro's lifecycle.
+  if (document.readyState === 'loading') {
+    // Loading hasn't finished yet
+    document.addEventListener('DOMContentLoaded', initializeNavbar);
+  } else {
+    // `DOMContentLoaded` has already fired
+    console.log('DOMContentLoaded already fired, calling initializeNavbar directly.');
+    initializeNavbar();
+  }
+  
+  // Also listen for Astro's page load event for client-side navigation
+  document.addEventListener('astro:page-load', () => {
+    console.log('astro:page-load event fired in Navbar.astro, re-initializing.');
+    initializeNavbar();
+  });
+
+</script>
