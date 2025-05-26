@@ -7,6 +7,86 @@ import 'swiper/css/pagination';
 import 'swiper/css/effect-coverflow';
 
 // JS Imports moved to the client-side script below
+
+const apiKey = import.meta.env.ABSTRACT_API_KEY;
+
+const portfolioItemsConfig = [
+  {
+    id: "Artisan",
+    name: "Site Vitrine pour Artisan",
+    description: "Création d'un site web moderne et responsive pour un artisan local, mettant en valeur ses services et réalisations.",
+    liveUrl: "https://boutique-artisan.netlify.app",
+    placeholderImg: "https://via.placeholder.com/400x250.png?text=Site+Artisan",
+    altText: "Aperçu Site Artisan",
+    localFallbackImg: "/Portfolio preview/boutique-artisan.png" // Added local fallback
+  },
+  {
+    id: "Restaurant",
+    name: "Site Web pour Restaurant",
+    description: "Développement d'un site avec menu en ligne, galerie photos et formulaire de réservation.",
+    liveUrl: "#", // Update this URL to a real one to get a screenshot
+    placeholderImg: "https://via.placeholder.com/400x250.png?text=Site+Restaurant",
+    altText: "Aperçu Site Restaurant"
+  },
+  {
+    id: "Photographe",
+    name: "Portfolio en Ligne",
+    description: "Mise en place d'un portfolio élégant pour un photographe, optimisé pour l'affichage d'images haute résolution.",
+    liveUrl: "#", // Update this URL to a real one to get a screenshot
+    placeholderImg: "https://via.placeholder.com/400x250.png?text=Portfolio+Photographe",
+    altText: "Aperçu Portfolio Photographe"
+  },
+  {
+    id: "BoltDIY2",
+    name: "Projet Bolt DIY 2",
+    description: "Un exemple de site web interactif créé avec Bolt.",
+    liveUrl: "https://bolt-diy-2-1746478852874.netlify.app/",
+    placeholderImg: "https://via.placeholder.com/400x250.png?text=Aperçu+Bolt+DIY+2",
+    altText: "Aperçu Projet Bolt DIY 2"
+  }
+];
+
+let portfolioPreviews = {};
+
+if (apiKey) {
+  console.log("AbstractAPI key found. Fetching screenshots...");
+  const fetchPromises = portfolioItemsConfig.map(async (item) => {
+    if (item.liveUrl && item.liveUrl !== "#" && !item.liveUrl.startsWith('https://via.placeholder.com')) {
+      try {
+        const apiUrl = `https://screenshot.abstractapi.com/v1/?api_key=${apiKey}&url=${encodeURIComponent(item.liveUrl)}&json=true&width=400&height=250&capture_full_page=false&delay=2`;
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+          const errorBody = await response.text();
+          console.error(`AbstractAPI error for ${item.liveUrl} [${response.status}]: ${errorBody.substring(0, 300)}`);
+          return { id: item.id, url: item.localFallbackImg || item.placeholderImg }; // Use local fallback if API error
+        }
+        const data = await response.json();
+        if (data.url) {
+          console.log(`Screenshot fetched for ${item.liveUrl}: ${data.url}`);
+          return { id: item.id, url: data.url };
+        } else {
+          console.warn(`AbstractAPI did not return a URL for ${item.liveUrl}. Response:`, JSON.stringify(data).substring(0, 300));
+          return { id: item.id, url: item.localFallbackImg || item.placeholderImg }; // Use local fallback if no URL in response
+        }
+      } catch (error) {
+        console.error(`Failed to fetch screenshot for ${item.liveUrl}:`, error);
+        return { id: item.id, url: item.localFallbackImg || item.placeholderImg }; // Use local fallback on any other fetch error
+      }
+    }
+    // For items not fetched via API (e.g., liveUrl is "#" or placeholder)
+    return { id: item.id, url: item.localFallbackImg || item.placeholderImg };
+  });
+
+  const results = await Promise.all(fetchPromises);
+  results.forEach(result => {
+    portfolioPreviews[result.id] = result.url;
+  });
+} else {
+  console.warn("ABSTRACT_API_KEY not found in .env. Using placeholder or local fallback images for portfolio.");
+  portfolioItemsConfig.forEach(item => {
+    portfolioPreviews[item.id] = item.localFallbackImg || item.placeholderImg;
+  });
+}
 ---
 
 <Layout title="Accueil">
@@ -26,7 +106,9 @@ import 'swiper/css/effect-coverflow';
 
 		<div class="service-cards">
 			<article class="service-card">
-				<img src="https://via.placeholder.com/300x150.png?text=Réparation+PC" alt="Réparation Informatique" class="service-card-image">
+				<div class="service-card-image-container service-card-image-container--with-gradient">
+          <div id="lottie-pc-repair" class="service-card-lottie"></div>
+				</div>
 				<h3><i class="icon-repair"></i> Réparation Informatique</h3>
 				<p>
 					Dépannage, montage sur mesure, optimisation. Nous redonnons vie à votre matériel.
@@ -41,7 +123,9 @@ import 'swiper/css/effect-coverflow';
 			</article>
 
 			<article class="service-card">
-				<img src="https://via.placeholder.com/300x150.png?text=Site+Web" alt="Création de Site Web" class="service-card-image">
+				<div class="service-card-image-container service-card-image-container--with-gradient">
+          <div id="lottie-web-design" class="service-card-lottie"></div>
+				</div>
 				<h3><i class="icon-web"></i> Création de Sites Web</h3>
 				<p>
 					Sites vitrines modernes, responsives et optimisés pour votre présence en ligne.
@@ -56,7 +140,9 @@ import 'swiper/css/effect-coverflow';
 			</article>
 
 			<article class="service-card">
-				<img src="https://via.placeholder.com/300x150.png?text=Streaming+Media" alt="Hébergement Streaming" class="service-card-image">
+				<div class="service-card-image-container service-card-image-container--with-gradient">
+					<div id="lottie-streaming" class="service-card-lottie"></div>
+				</div>
 				<h3><i class="icon-stream"></i> Hébergement Streaming</h3>
 				<p>
 					Votre propre plateforme média (Jellyfin, etc.) accessible partout, en toute sécurité.
@@ -70,8 +156,11 @@ import 'swiper/css/effect-coverflow';
 				<a href="#contact" class="cta-button">En savoir plus</a>
 			</article>
 
-			<article class="service-card">
-				<img src="https://via.placeholder.com/300x150.png?text=Modèle+IA" alt="Hébergement Modèles IA" class="service-card-image">
+			<article class="service-card service-card--coming-soon">
+				<div class="coming-soon-banner">Prochainement</div>
+				<div class="service-card-image-container service-card-image-container--with-gradient">
+					<img src="https://via.placeholder.com/300x150.png?text=Modèle+IA" alt="Hébergement Modèles IA" class="service-card-image">
+				</div>
 				<h3><i class="icon-ai"></i> Hébergement Modèles IA</h3>
 				<p>
 					Déployez et gérez vos modèles d'IA pour explorer leur potentiel. (Service en développement).
@@ -92,19 +181,18 @@ import 'swiper/css/effect-coverflow';
 		<p>Basé près de 04700 Le Castellet, nous intervenons dans les environs.</p>
 		<div class="map-container">
 			<iframe
+				src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d22977.698102809892!2d5.758781840588819!3d43.85219171387919!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12c913080a0d567b%3A0x40819a5fd970000!2s04700%20Le%20Castellet!5e0!3m2!1sen!2sfr!4v1716305000000!5m2!1sen!2sfr"
 				width="100%"
-				height="300"
-				frameborder="0"
-				scrolling="no"
-				marginheight="0"
-				marginwidth="0"
-				src="https://www.openstreetmap.org/export/embed.html?bbox=5.755,43.843,5.795,43.863&layer=mapnik&marker=43.853,5.775"
-				style="border: 1px solid black; border-radius: 8px;"
-				title="Carte de localisation SOS-PC"
-			></iframe>
+				height="350"
+				style="border:0; border-radius: 8px;"
+				allowfullscreen=""
+				loading="lazy"
+				referrerpolicy="no-referrer-when-downgrade"
+				title="Carte de localisation SOS-PC - Google Maps">
+			</iframe>
 			<br/>
 			<small>
-				<a href="https://www.openstreetmap.org/?mlat=43.853&mlon=5.775#map=15/43.853/5.775" target="_blank">Voir une carte plus grande</a>
+				<a href="https://maps.google.com/?q=04700+Le+Castellet" target="_blank">Voir sur Google Maps</a>
 			</small>
 		</div>
 	</section>
@@ -115,46 +203,30 @@ import 'swiper/css/effect-coverflow';
 
 		<div class="swiper vitrine-swiper">
 			<div class="swiper-wrapper">
-				<div class="swiper-slide">
-					<article class="vitrine-item">
-						<img src="https://via.placeholder.com/400x250.png?text=Site+Artisan" alt="Aperçu Site Artisan" class="vitrine-image">
-						<div class="vitrine-content">
-							<h3>Site Vitrine pour Artisan</h3>
-							<p>Création d'un site web moderne et responsive pour un artisan local, mettant en valeur ses services et réalisations.</p>
-							<a href="#" target="_blank" rel="noopener noreferrer" class="vitrine-link">Voir le site</a>
-						</div>
-					</article>
-				</div>
-				<div class="swiper-slide">
-					<article class="vitrine-item">
-						<img src="https://via.placeholder.com/400x250.png?text=Site+Restaurant" alt="Aperçu Site Restaurant" class="vitrine-image">
-						<div class="vitrine-content">
-							<h3>Site Web pour Restaurant</h3>
-							<p>Développement d'un site avec menu en ligne, galerie photos et formulaire de réservation.</p>
-							<a href="#" target="_blank" rel="noopener noreferrer" class="vitrine-link">Voir le site</a>
-						</div>
-					</article>
-				</div>
-				<div class="swiper-slide">
-					<article class="vitrine-item">
-						<img src="https://via.placeholder.com/400x250.png?text=Portfolio+Photographe" alt="Aperçu Portfolio Photographe" class="vitrine-image">
-						<div class="vitrine-content">
-							<h3>Portfolio en Ligne</h3>
-							<p>Mise en place d'un portfolio élégant pour un photographe, optimisé pour l'affichage d'images haute résolution.</p>
-							<a href="#" target="_blank" rel="noopener noreferrer" class="vitrine-link">Voir le site</a>
-						</div>
-					</article>
-				</div>
-				<div class="swiper-slide">
-					<article class="vitrine-item">
-						<img src="https://via.placeholder.com/400x250.png?text=Aperçu+Bolt+DIY+2" alt="Aperçu Projet Bolt DIY 2" class="vitrine-image">
-						<div class="vitrine-content">
-							<h3>Projet Bolt DIY 2</h3>
-							<p>Un exemple de site web interactif créé avec Bolt.</p>
-							<a href="https://bolt-diy-2-1746478852874.netlify.app/" target="_blank" rel="noopener noreferrer" class="vitrine-link">Voir le site</a>
-						</div>
-					</article>
-				</div>
+        {portfolioItemsConfig.map(item => (
+          <div class="swiper-slide">
+            <article class="vitrine-item">
+              <img 
+                src={portfolioPreviews[item.id] || item.placeholderImg} 
+                alt={item.altText} 
+                class="vitrine-image"
+                loading="lazy"
+              />
+              <div class="vitrine-content">
+                <h3>{item.name}</h3>
+                <p>{item.description}</p>
+                <a 
+                  href={item.liveUrl === "#" ? "#" : item.liveUrl} 
+                  target={item.liveUrl === "#" ? "_self" : "_blank"} 
+                  rel="noopener noreferrer" 
+                  class:list={["vitrine-link", { "disabled-link": item.liveUrl === "#" }]}
+                >
+                  Voir le site
+                </a>
+              </div>
+            </article>
+          </div>
+        ))}
 			</div>
 			<div class="swiper-pagination"></div>
 			<div class="swiper-button-prev"></div>
@@ -207,8 +279,10 @@ import 'swiper/css/effect-coverflow';
 <script>
   import Swiper from 'swiper';
   import { Navigation, Pagination, EffectCoverflow } from 'swiper/modules';
+  import lottie from 'lottie-web';
 
   document.addEventListener('DOMContentLoaded', () => {
+    // Swiper initialization
     const swiper = new Swiper('.vitrine-swiper', {
       modules: [Navigation, Pagination, EffectCoverflow],
       effect: 'coverflow',
@@ -232,6 +306,42 @@ import 'swiper/css/effect-coverflow';
         prevEl: '.swiper-button-prev',
       },
     });
+
+    // Lottie animation for Web Design card
+    const lottieWebDesignContainer = document.getElementById('lottie-web-design');
+    if (lottieWebDesignContainer) {
+      lottie.loadAnimation({
+        container: lottieWebDesignContainer,
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: '/web-design/animations/43f834cb-31ab-428c-acf2-2674d3b07d94.json'
+      });
+    }
+
+    // Lottie animation for PC Repair card
+    const lottiePcRepairContainer = document.getElementById('lottie-pc-repair');
+    if (lottiePcRepairContainer) {
+      lottie.loadAnimation({
+        container: lottiePcRepairContainer,
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: '/PC-repair/animations/8acfa0f0-493f-445c-a1a3-ae798829ce77.json'
+      });
+    }
+
+    // Lottie animation for Streaming card
+    const lottieStreamingContainer = document.getElementById('lottie-streaming');
+    if (lottieStreamingContainer) {
+      lottie.loadAnimation({
+        container: lottieStreamingContainer,
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: '/Streaming/animations/3add7b2a-2592-4274-a7f6-614fcd7bfe31.json'
+      });
+    }
   });
 </script>
 
@@ -253,13 +363,8 @@ import 'swiper/css/effect-coverflow';
 		position: relative;
 		/* background-color: transparent; Removed, main has bg now */
 		border-radius: 8px;
-		transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-	}
-
-	section:hover {
-		background-color: var(--section-hover-bg); /* Use CSS variable */
-		transform: translateY(-3px);
-		box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+		/* Removed transition for hover effects */
+		/* transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease; */
 	}
 
 	section:not(:last-of-type)::after {
@@ -274,10 +379,6 @@ import 'swiper/css/effect-coverflow';
 		background: linear-gradient(to right, transparent, var(--section-separator-color), transparent); /* Use CSS variable */
 		opacity: 0.5;
 		transition: opacity 0.3s ease, background 0.3s ease;
-	}
-
-	section:hover::after {
-		opacity: 0.3;
 	}
 
 	.section-image {
@@ -317,24 +418,96 @@ import 'swiper/css/effect-coverflow';
 		transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s ease;
 		overflow: hidden;
 		border: 1px solid var(--border-color); /* Add subtle border */
+		position: relative; /* Needed for the banner positioning */
 	}
+
 	.service-card:hover {
 		transform: translateY(-5px);
 		box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
 	}
+
+	.service-card--coming-soon .service-card-image-container,
+	.service-card--coming-soon h3,
+	.service-card--coming-soon p,
+	.service-card--coming-soon ul,
+	.service-card--coming-soon .cta-button {
+		opacity: 0.5; /* Dim the content of the coming soon card */
+		pointer-events: none; /* Disable interactions with dimmed content */
+	}
+
+	.service-card--coming-soon .cta-button {
+		background-color: var(--disabled-button-bg-color, #6c757d); /* Greyed out button */
+		cursor: not-allowed;
+	}
+
+
+	.coming-soon-banner {
+		position: absolute;
+		top: 500px !important;   /* User-set value, maintained */
+		left: -100px !important;  /* Adjusted for new length */
+		background-color: rgb(var(--accent)); /* Purple theme */
+		color: white;
+		padding: 10px 250px;     /* Increased padding for length */
+		font-size: 0.9rem;
+		font-weight: bold;
+		text-align: center;
+		transform: rotate(-45deg);
+		transform-origin: top left;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+		z-index: 10;
+		white-space: nowrap;
+		letter-spacing: 0.5px;
+	}
+
+
+	.service-card-image-container {
+		position: relative;
+	}
+
 	.service-card-image {
 		width: 100%;
-		height: 150px;
+		height: 150px; /* Default height for card images */
 		object-fit: cover;
 		display: block;
 	}
+
+  .service-card-lottie {
+    width: 100%;
+    height: 180px; /* Match the GIF card image height or adjust as needed */
+    display: block;
+  }
+
+	/* Specific styles for the GIF card image to make it taller */
+	.service-card-image-container--with-gradient .service-card-image,
+  .service-card-image-container--with-gradient .service-card-lottie {
+		height: 180px; /* Increased height for the GIF/Lottie */
+	}
+
+	/* Gradient overlay for the GIF card image */
+	.service-card-image-container--with-gradient::after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		height: 70%; /* Gradient covers the bottom 70% of the image height */
+		background: linear-gradient(
+			to bottom,
+			transparent 0%, /* Starts transparent at the top of this pseudo-element */
+			var(--card-bg-color) 100% /* Fades to card background color at the bottom */
+		);
+		pointer-events: none; /* Allows clicks to pass through if needed */
+	}
+
 	.service-card h3 {
 		display: flex;
 		align-items: center;
 		gap: 0.7rem;
-		margin-top: 0;
+		margin-top: 0; /* Reset margin if image container is used */
 		color: var(--heading-color); /* Use CSS variable */
 		padding: 1rem 1.5rem 0 1.5rem;
+		z-index: 1; /* Ensure text is above gradient if it overlaps slightly */
+    position: relative; /* For z-index to work */
 	}
 	.service-card p {
 		flex-grow: 1;
@@ -342,6 +515,8 @@ import 'swiper/css/effect-coverflow';
 		color: var(--card-text-color); /* Use CSS variable */
 		padding: 0 1.5rem;
 		transition: color 0.3s ease;
+		z-index: 1;
+    position: relative;
 	}
 	.service-card ul {
 		font-size: 0.9em;
@@ -350,6 +525,8 @@ import 'swiper/css/effect-coverflow';
 		flex-grow: 1;
 		color: var(--card-text-color); /* Use CSS variable */
 		transition: color 0.3s ease;
+		z-index: 1;
+    position: relative;
 	}
 	.service-card li {
 		margin-bottom: 0.4rem;
@@ -365,6 +542,8 @@ import 'swiper/css/effect-coverflow';
 		font-weight: bold;
 		transition: background-color 0.2s ease, color 0.3s ease;
 		margin: 1.5rem; /* Keep margin consistent */
+		z-index: 1;
+    position: relative;
 	}
 	.cta-button:hover {
 		background-color: var(--button-hover-bg-color); /* Use CSS variable */
@@ -394,16 +573,12 @@ import 'swiper/css/effect-coverflow';
 	}
 	.map-container iframe {
 		max-width: 100%;
-		filter: grayscale(var(--map-grayscale, 30%)) contrast(var(--map-contrast, 90%)); /* Allow theme override */
-		opacity: 0.9;
+		opacity: 0.95; 
 		border-radius: 8px;
 		border: 1px solid var(--border-color);
-		transition: filter 0.3s ease, border-color 0.3s ease;
+		transition: opacity 0.3s ease, border-color 0.3s ease; 
 	}
-	html.dark .map-container iframe {
-		--map-grayscale: 10%; /* Less grayscale in dark mode */
-		--map-contrast: 100%;
-	}
+
 	.map-container small {
 		display: block;
 		margin-top: 0.5rem;
@@ -456,7 +631,7 @@ import 'swiper/css/effect-coverflow';
 		opacity: 0.7;
 	}
 	.swiper-slide .vitrine-item {
-		background-color: var(--card-bg-color); /* Use CSS variable */
+		background-color: var(--card-bg-color); 
 		border-radius: 8px;
 		overflow: hidden;
 		display: flex;
@@ -464,21 +639,20 @@ import 'swiper/css/effect-coverflow';
 		width: 100%;
 		margin: 0 auto;
 		box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-		transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+		transition: background-color 0.3s ease; 
 		height: 100%;
-		border: 1px solid var(--border-color); /* Add subtle border */
+		border: 1px solid var(--border-color); 
 	}
-	.swiper-slide:hover .vitrine-item {
-		transform: scale(1.02);
-		box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-	}
+
 	.vitrine-image {
 		width: 100%;
 		height: 200px;
 		object-fit: cover;
+		object-position: top; /* This will prioritize the top of the image */
 		display: block;
-		border-bottom: 3px solid var(--link-color); /* Use CSS variable */
+		border-bottom: 3px solid var(--link-color); 
 		transition: border-color 0.3s ease;
+    background-color: var(--card-bg-color); /* Add a background for images that might be transparent or slow loading */
 	}
 	.vitrine-content {
 		padding: 1.5rem;
@@ -489,11 +663,11 @@ import 'swiper/css/effect-coverflow';
 	}
 	.vitrine-content h3 {
 		margin-top: 0;
-		color: var(--heading-color); /* Use CSS variable */
+		color: var(--heading-color); 
 		margin-bottom: 0.75rem;
 	}
 	.vitrine-content p {
-		color: var(--card-text-color); /* Use CSS variable */
+		color: var(--card-text-color); 
 		flex-grow: 1;
 		margin-bottom: 1rem;
 		transition: color 0.3s ease;
@@ -501,39 +675,51 @@ import 'swiper/css/effect-coverflow';
 	.vitrine-link {
 		display: inline-block;
 		background-color: transparent;
-		color: var(--link-color); /* Use CSS variable */
+		color: var(--link-color); 
 		padding: 0.5rem 0;
 		border-radius: 4px;
 		text-decoration: none;
 		font-weight: bold;
 		transition: color 0.2s ease, background-color 0.2s ease, border-color 0.3s ease;
 		margin-top: auto;
-		border: 1px solid var(--link-color); /* Use CSS variable */
+		border: 1px solid var(--link-color); 
 		text-align: center;
 		max-width: 150px;
 	}
 	.vitrine-link:hover {
-		background-color: rgba(var(--accent), 0.2); /* Keep accent for hover */
+		background-color: rgba(var(--accent), 0.2); 
 		color: var(--accent-dark);
 	}
+  .vitrine-link.disabled-link {
+    opacity: 0.5;
+    pointer-events: none;
+    background-color: var(--disabled-button-bg-color, #6c757d);
+    border-color: var(--disabled-button-bg-color, #6c757d);
+    color: var(--button-text-color);
+  }
 	html.dark .vitrine-link:hover {
 		background-color: rgba(var(--accent-light), 0.2);
 		color: white;
 	}
+  html.dark .vitrine-link.disabled-link {
+    background-color: var(--disabled-button-bg-color, #5a6268);
+    border-color: var(--disabled-button-bg-color, #5a6268);
+  }
+
 
 	.swiper-pagination-bullet {
-		background-color: var(--text-color); /* Use CSS variable */
+		background-color: var(--text-color); 
 		opacity: 0.5;
 		transition: background-color 0.3s ease;
 	}
 	.swiper-pagination-bullet-active {
-		background-color: var(--link-color); /* Use CSS variable */
+		background-color: var(--link-color); 
 		opacity: 1;
 	}
 	.swiper-button-prev,
 	.swiper-button-next {
-		color: var(--link-color); /* Use CSS variable */
-		background-color: rgba(var(--card-bg-color-rgb, 35, 38, 45), 0.5); /* Use card bg with opacity */
+		color: var(--link-color); 
+		background-color: rgba(var(--card-bg-color-rgb, 35, 38, 45), 0.5); 
 		border-radius: 50%;
 		width: 40px;
 		height: 40px;
@@ -543,8 +729,7 @@ import 'swiper/css/effect-coverflow';
 	}
 	html.light .swiper-button-prev,
 	html.light .swiper-button-next {
-		/* Ensure card-bg-color-rgb is defined for light theme or use a fallback */
-		background-color: rgba(255, 255, 255, 0.5); /* Example for light theme */
+		background-color: rgba(255, 255, 255, 0.5); 
 	}
 	.swiper-button-prev:hover,
 	.swiper-button-next:hover {
@@ -552,7 +737,7 @@ import 'swiper/css/effect-coverflow';
 	}
 	html.light .swiper-button-prev:hover,
 	html.light .swiper-button-next:hover {
-		background-color: rgba(255, 255, 255, 0.8); /* Example for light theme */
+		background-color: rgba(255, 255, 255, 0.8); 
 	}
 	.swiper-button-prev::after,
 	.swiper-button-next::after {
@@ -571,25 +756,23 @@ import 'swiper/css/effect-coverflow';
 		margin-bottom: 2rem;
 	}
 	.contact-form {
-		background-color: var(--card-bg-color); /* Use CSS variable */
+		background-color: var(--card-bg-color); 
 		padding: 2rem;
 		border-radius: 8px;
 		max-width: 600px;
 		margin: 0 auto 2rem auto;
 		box-sizing: border-box;
-		transition: box-shadow 0.3s ease, background-color 0.3s ease;
-		border: 1px solid var(--border-color); /* Add subtle border */
+		transition: background-color 0.3s ease; 
+		border: 1px solid var(--border-color); 
 	}
-	.contact-form:hover {
-		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-	}
+
 	.form-group {
 		margin-bottom: 1.5rem;
 	}
 	.form-group label {
 		display: block;
 		margin-bottom: 0.5rem;
-		color: var(--text-color); /* Use CSS variable */
+		color: var(--text-color); 
 		font-weight: bold;
 		transition: color 0.3s ease;
 	}
@@ -597,9 +780,9 @@ import 'swiper/css/effect-coverflow';
 	.form-group textarea {
 		width: 100%;
 		padding: 0.8rem;
-		border: 1px solid var(--input-border-color); /* Use CSS variable */
-		background-color: var(--input-bg-color); /* Use CSS variable */
-		color: var(--input-text-color); /* Use CSS variable */
+		border: 1px solid var(--input-border-color); 
+		background-color: var(--input-bg-color); 
+		color: var(--input-text-color); 
 		border-radius: 4px;
 		font-size: 1rem;
 		box-sizing: border-box;
@@ -608,15 +791,15 @@ import 'swiper/css/effect-coverflow';
 	.form-group input:focus,
 	.form-group textarea:focus {
 		outline: none;
-		border-color: var(--input-focus-border-color); /* Use CSS variable */
-		box-shadow: 0 0 0 2px var(--input-focus-shadow-color); /* Use CSS variable */
+		border-color: var(--input-focus-border-color); 
+		box-shadow: 0 0 0 2px var(--input-focus-shadow-color); 
 	}
 	.submit-button {
 		display: block;
 		width: 100%;
 		padding: 0.9rem 1.5rem;
-		background-color: var(--button-bg-color); /* Use CSS variable */
-		color: var(--button-text-color); /* Use CSS variable */
+		background-color: var(--button-bg-color); 
+		color: var(--button-text-color); 
 		border: none;
 		border-radius: 5px;
 		font-size: 1.1rem;
@@ -625,7 +808,7 @@ import 'swiper/css/effect-coverflow';
 		transition: background-color 0.2s ease, color 0.3s ease;
 	}
 	.submit-button:hover {
-		background-color: var(--button-hover-bg-color); /* Use CSS variable */
+		background-color: var(--button-hover-bg-color); 
 	}
 
 	.contact-buttons {
@@ -643,26 +826,25 @@ import 'swiper/css/effect-coverflow';
 		align-items: center;
 		justify-content: center;
 		gap: 0.6rem;
-		background-color: var(--contact-button-bg); /* Use CSS variable */
-		color: var(--contact-button-text); /* Use CSS variable */
+		background-color: var(--contact-button-bg); 
+		color: var(--contact-button-text); 
 		padding: 0.8rem 1.5rem;
 		border-radius: 5px;
 		text-decoration: none;
 		font-weight: bold;
 		margin: 0.5rem;
 		transition: background-color 0.2s ease, transform 0.1s ease, color 0.3s ease, border-color 0.3s ease;
-		border: 1px solid var(--contact-button-border); /* Use CSS variable */
+		border: 1px solid var(--contact-button-border); 
 		min-width: 150px;
 	}
 	.contact-button:hover {
-		background-color: var(--contact-button-hover-bg); /* Use CSS variable */
+		background-color: var(--contact-button-hover-bg); 
 		transform: translateY(-2px);
 	}
 	.contact-button .icon {
 		font-size: 1.2em;
 		display: inline-block;
 	}
-	/* Specific button colors can be overridden or kept if desired */
 	.contact-button.phone { background-color: #4CAF50; border-color: #388E3C; color: white; }
 	.contact-button.phone:hover { background-color: #66BB6A; }
 	.contact-button.discord { background-color: #5865F2; border-color: #4650c1; color: white; }
@@ -670,10 +852,9 @@ import 'swiper/css/effect-coverflow';
 	.contact-button.telegram { background-color: #0088cc; border-color: #006da3; color: white; }
 	.contact-button.telegram:hover { background-color: #33aadd; }
 
-	/* Ensure specific button colors adapt if they are meant to be themed */
-	html.light .contact-button.phone { /* Adjust if needed for light theme */ }
-	html.light .contact-button.discord { /* Adjust if needed for light theme */ }
-	html.light .contact-button.telegram { /* Adjust if needed for light theme */ }
+	html.light .contact-button.phone {}
+	html.light .contact-button.discord {}
+	html.light .contact-button.telegram {}
 
 
 	@media (max-width: 768px) {
